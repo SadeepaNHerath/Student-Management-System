@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+        }
+        table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Student Management System</h1>
+    
+    <form id="studentForm">
+        <h2>Student Details</h2>
+        <label for="studentName">Name:</label>
+        <input type="text" id="studentName" required><br><br>
+        <label for="studentAge">Age:</label>
+        <input type="number" id="studentAge" required><br><br>
+        
+        <h2>Guardian Details</h2>
+        <label for="guardianName">Name:</label>
+        <input type="text" id="guardianName" required><br><br>
+        <label for="guardianContact">Contact Number:</label>
+        <input type="text" id="guardianContact" required><br><br>
+        
+        <button type="button" onclick="addStudent()">Add Student</button>
+    </form>
+
+    <h2>Student Records</h2>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Age</th>
+                <th>Guardian Name</th>
+                <th>Contact Number</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script src="app.js</script>
+</body>
+</html>
