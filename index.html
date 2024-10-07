@@ -3,76 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Data Collection Form</title>
+    <title>Student Management - Home</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 </head>
+<body class="d-flex flex-column min-vh-100 bg-primary bg-gradient text-light">
 
-<body>
-    <div class="container my-5">
-        <h2 class="text-center mb-5" data-aos="fade-down">Student Data Collection Form</h2>
+    <header class="d-flex align-items-center justify-content-center" style="background-image: url('img src/student-management-system.png'); height: 50vh; background-size: cover; background-position: center;" data-aos="fade-down">
+        <h1 class="display-4 bg-dark bg-opacity-50 px-3 py-2">Welcome to the Student Management System</h1>
+    </header>
 
-        <form id="studentForm" data-aos="fade-up" novalidate>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label for="fName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="fName" placeholder="Enter first name" required>
-                    <div class="invalid-feedback">
-                        Please provide a first name.
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label for="lName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lName" placeholder="Enter last name" required>
-                    <div class="invalid-feedback">
-                        Please provide a last name.
+    <div class="container mt-n5">
+        <div class="row g-5 justify-content-center text-center">
+            <div class="col-md-6" data-aos="fade-up">
+                <div class="card shadow">
+                    <img src="img src/add-student.png" class="card-img-top" alt="Add Student" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">Add New Student</h5>
+                        <p class="card-text">Click here to add new students to the database.</p>
+                        <a href="add_student.html" class="btn btn-primary">Add Student</a>
                     </div>
                 </div>
             </div>
 
-            <div class="my-3">
-                <label for="address" class="form-label">Address</label>
-                <input type="text" class="form-control" id="address" placeholder="1234 Main St" required>
-                <div class="invalid-feedback">
-                    Please provide an address.
-                </div>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="dob" class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" id="dob" required>
-                    <div class="invalid-feedback">
-                        Please provide a date of birth.
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="nic" class="form-label">NIC</label>
-                    <input type="text" class="form-control" id="nic" placeholder="Enter NIC number" required>
-                    <div class="invalid-feedback">
-                        Please provide a NIC number.
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="contact" class="form-label">Contact</label>
-                    <input type="tel" class="form-control" id="contact" placeholder="Enter contact number" required>
-                    <div class="invalid-feedback">
-                        Please provide a contact number.
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card shadow">
+                    <img src="img src/view-student.png" class="card-img-top" alt="View Students" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">View All Students</h5>
+                        <p class="card-text">View, edit, or delete existing student data.</p>
+                        <a href="view_student.html" class="btn btn-secondary">View Students</a>
                     </div>
                 </div>
             </div>
-
-            <div class="d-flex justify-content-center my-4">
-                <button type="submit" class="btn btn-primary me-2" data-aos="fade-right">
-                    Add
-                </button>
-                <button type="reset" class="btn btn-secondary" data-aos="fade-left">
-                    Clear
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
+
+    <footer class="bg-secondary text-light mt-auto py-3">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+            <div class="col-md-4 d-flex align-items-center">
+                <span class="text-light">© 2024 Sadeepa N Herath</span>
+            </div>
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                <li class="ms-3"><a class="text-light" href="https://github.com/SadeepaNHerath" target="_blank"><i class="bi bi-github"></i></a></li>
+                <li class="ms-3"><a class="text-light" href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" target="_blank"><i class="bi bi-tiktok"></i></a></li>
+                <li class="ms-3"><a class="text-light" href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" target="_blank"><i class="bi bi-instagram"></i></a></li>
+                <li class="ms-3"><a class="text-light" href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" target="_blank"><i class="bi bi-facebook"></i></a></li>
+            </ul>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
