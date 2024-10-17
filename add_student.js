@@ -27,7 +27,8 @@ async function addStudent() {
         try {
             const response = await fetch('http://localhost:8080/student/students', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                redirect: 'follow'
             });
 
             if (response.ok) {
