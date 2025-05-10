@@ -77,7 +77,7 @@ function loadStudents() {
         nextIndex = row.nextElementSibling.getElementById('rowId');
 
         row.innerHTML = `
-            <th scope="row" id='rowId' >${student.id}</th>
+            <th id='rowId'>${student.id}</th>
             <td>${student.firstName}</td>
             <td>${student.lastName}</td>
             <td>${student.address}</td>
@@ -85,11 +85,23 @@ function loadStudents() {
             <td>${student.nic}</td>
             <td>${student.contact}</td>
             <td>
-                <img src="data:image/jpeg;base64,${student.profilePic}" alt="Profile Picture" class="img-thumbnail" style="width: 50px; height: 50px;">
+                <figure class="image is-48x48">
+                    <img src="data:image/jpeg;base64,${student.profilePic}" alt="Profile Picture" class="is-rounded">
+                </figure>
             </td>
             <td>
-                <button class="btn btn-warning btn-sm" onclick="editStudent(${student.id})" data-aos="fade-right">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.id})" data-aos="fade-left">Delete</button>
+                <div class="buttons">
+                    <button class="button is-small is-warning" onclick="editStudent(${student.id})" data-aos="fade-right">
+                        <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                    </button>
+                    <button class="button is-small is-danger" onclick="deleteStudent(${student.id})" data-aos="fade-left">
+                        <span class="icon is-small">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </button>
+                </div>
             </td>
         `;
 

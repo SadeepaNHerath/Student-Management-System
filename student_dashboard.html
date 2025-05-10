@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+                <strong>Student Dashboard</strong>
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navMenu" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <button class="button is-light" onclick="logout()">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <!-- Profile section -->
+                <div class="column is-4">
+                    <div class="box" data-aos="fade-right">
+                        <div class="has-text-centered mb-4">
+                            <figure class="image is-128x128 is-inline-block mb-3">
+                                <img id="studentProfilePic" src="img src/profile-pic.png" alt="Student Profile" class="is-rounded">
+                            </figure>
+                            <h3 id="studentName" class="title is-4">Student Name</h3>
+                            <p id="studentId" class="subtitle is-6">ID: 12345</p>
+                        </div>
+
+                        <div class="content">
+                            <p><strong>Address:</strong> <span id="studentAddress">123 Student Lane</span></p>
+                            <p><strong>NIC:</strong> <span id="studentNic">9876543210</span></p>
+                            <p><strong>Contact:</strong> <span id="studentContact">555-123-4567</span></p>
+                        </div>
+
+                        <div class="field mt-5">
+                            <div class="control">
+                                <button class="button is-info is-fullwidth" id="editProfileBtn">
+                                    <span class="icon">
+                                        <i class="fas fa-user-edit"></i>
+                                    </span>
+                                    <span>Edit Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classes and attendance section -->
+                <div class="column is-8">
+                    <!-- Current classes -->
+                    <div class="box" data-aos="fade-left">
+                        <h3 class="title is-4">My Classes</h3>
+                        <table class="table is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Schedule</th>
+                                    <th>Attendance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classesTableBody">
+                                <!-- Classes will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Available classes to apply for -->
+                    <div class="box" data-aos="fade-up">
+                        <h3 class="title is-4">Available Classes</h3>
+                        <p class="subtitle is-6 mb-4">Click on a class to apply</p>
+                        
+                        <div class="columns is-multiline" id="availableClassesContainer">
+                            <!-- Available classes will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Attendance history -->
+                    <div class="box" data-aos="fade-up">
+                        <h3 class="title is-4">Attendance History</h3>
+                        <div class="tabs">
+                            <ul id="classTabsList">
+                                <!-- Class tabs will be loaded dynamically -->
+                                <li class="is-active"><a>All Classes</a></li>
+                            </ul>
+                        </div>
+
+                        <table class="table is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Class</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Attendance records will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer has-background-grey-dark has-text-white">
+        <div class="container">
+            <div class="columns">
+                <div class="column">
+                    <p>© 2024 Sadeepa N Herath</p>
+                </div>
+                <div class="column has-text-right">
+                    <div class="buttons is-right">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-github"></i></span>
+                        </a>
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-tiktok"></i></span>
+                        </a>
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-instagram"></i></span>
+                        </a>
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-facebook"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="app.js"></script>
+    <script src="student_dashboard.js"></script>
+    <script>
+        AOS.init();
+
+        // Navbar burger menu toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+            
+            if ($navbarBurgers.length > 0) {
+                $navbarBurgers.forEach( el => {
+                    el.addEventListener('click', () => {
+                        const target = el.dataset.target;
+                        const $target = document.getElementById(target);
+                        
+                        el.classList.toggle('is-active');
+                        $target.classList.toggle('is-active');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

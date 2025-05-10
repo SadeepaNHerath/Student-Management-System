@@ -1,101 +1,133 @@
-.profile-photo-container {
-    position: relative;
-    display: inline-block;
+/* Custom styles to supplement Bulma CSS for Student Management System */
+
+/* Hero background and overlay */
+.hero.is-primary {
+    background: linear-gradient(135deg, #00d1b2, #3273dc);
 }
 
-.profile-photo-container img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border: 5px solid #6a11cb;
+.navbar.is-primary {
+    background: linear-gradient(135deg, #00d1b2, #3273dc);
 }
 
-.upload-btn {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ffca28;
-    color: #000;
-    border: none;
-    border-radius: 50%;
-    padding: 10px;
-    cursor: pointer;
+.has-background-dark-transparent {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
 }
 
-.upload-btn:hover {
-    background-color: #ffc107;
+/* Dashboard cards */
+.dashboard-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
 }
 
-.profile-card {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #333;
-    text-align: center;
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
+.dashboard-card .icon.is-large {
+    height: 5rem;
+    width: 5rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-card .icon.is-large i {
+    font-size: 3rem;
+}
+
+/* Admin dashboard specific styles */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+/* Profile styles */
 .profile-photo {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 20px;
-    border: 5px solid #6a11cb;
+    border: 3px solid #00d1b2;
+    margin: 0 auto;
+    display: block;
 }
 
-.next-prev-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.search-container {
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-.search-container input {
-    width: 250px;
-    margin-right: 10px;
-    border-radius: 5px;
-}
-
-.profile-card h3,
-.profile-card p {
-    margin-bottom: 15px;
-}
-
-.profile-pic {
-    color: transparent;
-    transition: all 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Profile picture upload component */
+.file-upload {
     position: relative;
-    transition: all 0.3s ease;
-  }
-  .profile-pic input {
-    display: none;
-  }
-  .profile-pic img {
-    position: absolute;
+    display: inline-block;
+    margin: 1rem auto;
+}
+
+.file-upload-container {
+    position: relative;
+    width: 165px;
+    height: 165px;
+    margin: 0 auto;
+}
+
+.file-upload img {
     object-fit: cover;
     width: 165px;
     height: 165px;
-    box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.35);
-    border-radius: 100px;
-    z-index: 0;
-  }
-  .profile-pic .-label {
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.file-upload-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0;
+    border-radius: 50%;
     cursor: pointer;
-    height: 165px;
-    width: 165px;
-  }
+    transition: opacity 0.3s ease;
+}
+
+.file-upload-label:hover {
+    opacity: 1;
+}
+
+.file-upload-label .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+/* Table customizations */
+.student-table {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.student-table img {
+    border-radius: 50%;
+}
   .profile-pic:hover .-label {
     display: flex;
     justify-content: center;

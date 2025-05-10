@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management</title>
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="admin_dashboard.html">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+        
+        <div class="navbar-menu">
+            <div class="navbar-start">
+                <div class="navbar-item">
+                    <h2 class="title is-4 has-text-white" data-aos="fade-down">Attendance Management</h2>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <section class="section">
+        <div class="container" data-aos="fade-up">
+            <!-- Attendance Controls -->
+            <div class="box">
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Select Class</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="classSelect" onchange="loadStudentsForClass()">
+                                        <option value="">-- Select Class --</option>
+                                        <!-- Classes will be loaded dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-3">
+                        <div class="field">
+                            <label class="label">Date</label>
+                            <div class="control">
+                                <input class="input" type="date" id="attendanceDate" value="" onchange="loadAttendanceData()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-5">
+                        <div class="field">
+                            <label class="label">Quick Actions</label>
+                            <div class="buttons">
+                                <button class="button is-info" onclick="markAllPresent()">
+                                    <span class="icon">
+                                        <i class="fas fa-check-double"></i>
+                                    </span>
+                                    <span>Mark All Present</span>
+                                </button>
+                                <button class="button is-danger" onclick="markAllAbsent()">
+                                    <span class="icon">
+                                        <i class="fas fa-times-circle"></i>
+                                    </span>
+                                    <span>Mark All Absent</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Sheet -->
+            <div class="box" id="attendanceSheet" style="display: none;">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h3 id="attendanceClassTitle" class="title is-4"></h3>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <div class="level-item">
+                            <p id="attendanceSummary" class="subtitle is-6"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Mark As</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <!-- Students will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="field mt-4">
+                    <div class="control has-text-centered">
+                        <button class="button is-success" onclick="saveAttendance()">
+                            <span class="icon">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span>Save Attendance</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Students Message -->
+            <div class="notification is-info is-light has-text-centered" id="noStudentsMessage" style="display:none;">
+                <p>No students enrolled in this class or the class is not selected.</p>
+            </div>
+
+            <!-- Attendance History -->
+            <div class="box mt-5" data-aos="fade-up">
+                <h3 class="title is-4">Attendance History</h3>
+                
+                <div class="field has-addons mb-4">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            <select id="historyClassSelect" onchange="loadAttendanceHistory()">
+                                <option value="">All Classes</option>
+                                <!-- Classes will be loaded dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button class="button is-info" onclick="loadAttendanceHistory()">
+                            <span class="icon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Class</th>
+                                <th>Total Students</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance %</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceHistoryTableBody">
+                            <!-- Attendance history will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- View Attendance Details Modal -->
+    <div class="modal" id="attendanceDetailsModal">
+        <div class="modal-background"></div>
+        <div class="modal-card is-large">
+            <header class="modal-card-head">
+                <p class="modal-card-title" id="attendanceDetailsTitle">Attendance Details</p>
+                <button class="delete" aria-label="close" onclick="closeAttendanceDetailsModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceDetailsTableBody">
+                            <!-- Attendance details will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-primary" onclick="printAttendanceDetails()">Print</button>
+                <button class="button" onclick="closeAttendanceDetailsModal()">Close</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer has-background-grey-dark has-text-white">
+        <div class="container">
+            <div class="columns">
+                <div class="column">
+                    <p>© 2024 Sadeepa N Herath</p>
+                </div>
+                <div class="column has-text-right">
+                    <div class="buttons is-right">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-github"></i></span>
+                        </a>
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-tiktok"></i></span>
+                        </a>
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-instagram"></i></span>
+                        </a>
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                            <span class="icon"><i class="fab fa-facebook"></i></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="attendance_management.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</body>
+</html>
