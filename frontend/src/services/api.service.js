@@ -59,11 +59,15 @@ class ApiService {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'GET',
-                headers: this.getHeaders()
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-            return this.handleResponse(response);
+            return await this.handleResponse(response);
         } catch (error) {
             this.handleError(error);
+            return null;
         }
     }
 
@@ -71,12 +75,16 @@ class ApiService {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'POST',
-                headers: this.getHeaders(),
-                body: JSON.stringify(data)
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+                credentials: 'include'
             });
-            return this.handleResponse(response);
+            return await this.handleResponse(response);
         } catch (error) {
             this.handleError(error);
+            return null;
         }
     }
 
@@ -84,12 +92,16 @@ class ApiService {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'PUT',
-                headers: this.getHeaders(),
-                body: JSON.stringify(data)
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+                credentials: 'include'
             });
-            return this.handleResponse(response);
+            return await this.handleResponse(response);
         } catch (error) {
             this.handleError(error);
+            return null;
         }
     }
 
@@ -97,11 +109,15 @@ class ApiService {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'DELETE',
-                headers: this.getHeaders()
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
             });
-            return this.handleResponse(response);
+            return await this.handleResponse(response);
         } catch (error) {
             this.handleError(error);
+            return null;
         }
     }
 
@@ -119,14 +135,29 @@ class ApiService {
     }
 
     static async handleResponse(response) {
-        const data = await response.json();
-
         if (!response.ok) {
-            const error = data.message || response.statusText;
-            throw new Error(error);
+            // For 401 Unauthorized responses, redirect to login
+            if (response.status === 401) {
+                window.location.replace('login.html');
+                return null;
+            }
+            
+            // Try to parse error message from response
+            try {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `API Error: ${response.status}`);
+            } catch (e) {
+                throw new Error(`API Error: ${response.statusText || response.status}`);
+            }
         }
 
-        return data;
+        // Check if response has content
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+            return await response.json();
+        } else {
+            return {};
+        }
     }
 
     static handleError(error) {

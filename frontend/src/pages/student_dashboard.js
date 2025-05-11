@@ -17,34 +17,64 @@ let attendanceRecords = [];
 let classAttendancePercentages = {};
 
 document.addEventListener('DOMContentLoaded', async function () {
+    console.log('Initializing student dashboard...');
+    
     if (!auth.requireStudent()) {
+        console.warn('Authentication check failed. Redirecting to login page.');
         return;
     }
 
-    await loadStudentData(auth.studentId);
+    // Initialize event listeners
+    initializeEventListeners();
+    
+    try {
+        await loadStudentData(auth.studentId);
+        console.log('Student dashboard loaded successfully');
+    } catch (error) {
+        console.error('Failed to load student dashboard:', error);
+        showError('Error loading your dashboard data. Please try refreshing the page.');
+    }
 });
 
 async function loadStudentData(studentId) {
     try {
         showLoading('dashboardContent', 'Loading dashboard data...');
-        currentStudent = await ApiService.getStudent(studentId);
+        console.log(`Fetching student data for ID: ${studentId}`);
         
-        if (!currentStudent) throw new Error('Failed to fetch student data');
+        try {
+            currentStudent = await ApiService.getStudent(studentId);
+            
+            if (!currentStudent) {
+                throw new Error('Failed to fetch student data - empty response');
+            }
+            
+            console.log('Student data loaded:', currentStudent);
+            
+            // Normalize student data field names
+            currentStudent.firstName = currentStudent.fName;
+            currentStudent.lastName = currentStudent.lName;
+            
+            loadStudentProfile();
+        } catch (studentError) {
+            console.error('Error fetching student profile:', studentError);
+            showError(`Couldn't load your profile: ${studentError.message}`);
+        }
 
-        currentStudent.firstName = currentStudent.fName;
-        currentStudent.lastName = currentStudent.lName;
-
-        await Promise.all([
-            loadEnrolledClasses(studentId),
-            loadAvailableClasses(studentId),
-            loadAttendanceHistory(studentId)
-        ]);
-
-        loadStudentProfile();
+        // Load other data in parallel (continue even if one fails)
+        try {
+            await Promise.allSettled([
+                loadEnrolledClasses(studentId),
+                loadAvailableClasses(studentId),
+                loadAttendanceHistory(studentId)
+            ]);
+            console.log('All student data loaded');
+        } catch (dataError) {
+            console.error('Error loading additional student data:', dataError);
+        }
 
         hideLoading('dashboardContent');
     } catch (error) {
-        console.error('Error loading student data:', error);
+        console.error('Error loading student dashboard:', error);
         showError('Error loading dashboard data. Please try again later.');
         hideLoading('dashboardContent');
     }
@@ -109,9 +139,7 @@ async function loadStudentProfile() {
     }
 }
 
-document.getElementById('editProfileBtn').addEventListener('click', function () {
-    openEditProfileModal();
-});
+// Event listeners are now initialized in the initializeEventListeners function
 
 function openEditProfileModal() {
     const modalHTML = `
@@ -273,19 +301,36 @@ function showSuccess(message) {
 
 async function loadEnrolledClasses(studentId) {
     try {
+        console.log(`Loading enrolled classes for student ${studentId}`);
         const response = await fetch(`${API_BASE_URL}/classes/student/${studentId}`);
-        if (!response.ok) throw new Error('Failed to fetch enrolled classes');
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`API error: ${response.status} - ${errorText}`);
+            throw new Error(`Failed to fetch enrolled classes: ${response.status}`);
+        }
 
         enrolledClasses = await response.json();
-
-        const percentageResponse = await fetch(`${API_BASE_URL}/attendance/student/${studentId}/percentage`);
-        if (percentageResponse.ok) {
-            classAttendancePercentages = await percentageResponse.json();
+        console.log(`Found ${enrolledClasses.length} enrolled classes`);
+        
+        // Get attendance percentages
+        try {
+            const percentageResponse = await fetch(`${API_BASE_URL}/attendance/student/${studentId}/percentage`);
+            if (percentageResponse.ok) {
+                classAttendancePercentages = await percentageResponse.json();
+                console.log('Loaded attendance percentages:', classAttendancePercentages);
+            } else {
+                console.warn(`Could not load attendance percentages: ${percentageResponse.status}`);
+                classAttendancePercentages = {};
+            }
+        } catch (percentageError) {
+            console.error('Error loading attendance percentages:', percentageError);
+            classAttendancePercentages = {};
         }
 
         updateEnrolledClassesUI();
     } catch (error) {
         console.error('Error loading enrolled classes:', error);
+        showError(`Failed to load your classes: ${error.message}`);
         enrolledClasses = [];
         updateEnrolledClassesUI();
     }
@@ -375,14 +420,22 @@ function closeClassDetailsModal() {
 
 async function loadAvailableClasses(studentId) {
     try {
+        console.log(`Loading available classes for student ${studentId}`);
         const response = await fetch(`${API_BASE_URL}/classes/student/${studentId}/available`);
-        if (!response.ok) throw new Error('Failed to fetch available classes');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`API error: ${response.status} - ${errorText}`);
+            throw new Error(`Failed to fetch available classes: ${response.status}`);
+        }
 
         availableClasses = await response.json();
+        console.log(`Found ${availableClasses.length} available classes`);
 
         updateAvailableClassesUI();
     } catch (error) {
         console.error('Error loading available classes:', error);
+        showError(`Failed to load available classes: ${error.message}`);
         availableClasses = [];
         updateAvailableClassesUI();
     }
@@ -468,14 +521,22 @@ Period: ${new Date(classToApply.startDate).toLocaleDateString()} to ${new Date(c
 
 async function loadAttendanceHistory(studentId) {
     try {
+        console.log(`Loading attendance history for student ${studentId}`);
         const response = await fetch(`${API_BASE_URL}/attendance/student/${studentId}`);
-        if (!response.ok) throw new Error('Failed to fetch attendance records');
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`API error: ${response.status} - ${errorText}`);
+            throw new Error(`Failed to fetch attendance records: ${response.status}`);
+        }
 
         attendanceRecords = await response.json();
+        console.log(`Found ${attendanceRecords.length} attendance records`);
 
         updateAttendanceHistoryUI();
     } catch (error) {
         console.error('Error loading attendance history:', error);
+        showError(`Failed to load attendance history: ${error.message}`);
         attendanceRecords = [];
         updateAttendanceHistoryUI();
     }
@@ -583,7 +644,39 @@ function filterAttendanceByClass(className) {
 function logout() {
     if (confirm('Are you sure you want to log out?')) {
         auth.clearAuth();
+        
+        // Use window.location.replace to prevent back button from coming back to dashboard
+        window.location.replace('login.html');
+    }
+}
 
-        window.location.href = 'index.html';
+// Expose functions to window for HTML access
+window.logout = logout;
+
+function initializeEventListeners() {
+    console.log('Setting up student dashboard event listeners');
+    
+    // Edit profile button
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', openEditProfileModal);
+    } else {
+        console.warn('Edit profile button not found in DOM');
+    }
+    
+    // Navbar burger menu for mobile
+    const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    if (navbarBurgers.length > 0) {
+        navbarBurgers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.dataset.target;
+                const $target = document.getElementById(target);
+                
+                el.classList.toggle('is-active');
+                if ($target) {
+                    $target.classList.toggle('is-active');
+                }
+            });
+        });
     }
 }

@@ -178,7 +178,7 @@
                 </div>
                 <div class="level-right">
                     <div class="level-item">
-                        <button class="button is-primary" onclick="showAddClassModal()">
+                        <button class="button is-primary" id="addClassBtn">
                                 <span class="icon">
                                     <i class="fas fa-plus"></i>
                                 </span>
@@ -366,7 +366,11 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script src="admin_dashboard.js"></script>
+<script type="module">
+    import * as appModule from '../app.js';
+    window.auth = appModule.default || appModule.auth;
+</script>
+<script type="module" src="admin_dashboard.js"></script>
 <script>
     AOS.init();
 

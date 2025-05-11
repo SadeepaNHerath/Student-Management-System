@@ -167,8 +167,11 @@
     </div>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-<script src="../app.js"></script>
-<script src="student_dashboard.js"></script>
+<script type="module">
+    import * as appModule from '../app.js';
+    window.auth = appModule.default || appModule.auth;
+</script>
+<script type="module" src="student_dashboard.js"></script>
 <script>
     AOS.init();
 

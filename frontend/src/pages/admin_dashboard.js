@@ -17,15 +17,27 @@ let attendanceData = {};
 let activeClass = null;
 
 document.addEventListener('DOMContentLoaded', async function () {
+    console.log('Initializing admin dashboard...');
     if (!auth.requireAdmin()) {
+        console.warn('Authentication check failed. Redirecting to login page.');
         return;
     }
 
-    await Promise.all([
-        loadStudents(),
-        loadClasses(),
-        loadRequests()
-    ]);
+    // Initialize event listeners for UI elements
+    initializeEventListeners();
+
+    // Load data from backend
+    try {
+        await Promise.all([
+            loadStudents(),
+            loadClasses(),
+            loadRequests()
+        ]);
+        console.log('All data loaded successfully');
+    } catch (error) {
+        console.error('Error loading initial data:', error);
+        showError('Failed to load some data. Please try refreshing the page.');
+    }
 
     const adminNameElement = document.getElementById('adminName');
     if (adminNameElement) {
@@ -118,18 +130,26 @@ function showSuccess(message) {
 async function loadStudents() {
     try {
         showLoading('studentsTableContainer', 'Loading students data...');
-        students = await ApiService.getStudents();
+        const response = await fetch(`${API_BASE_URL}/student/students`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load students: ${response.status}`);
+        }
+        
+        students = await response.json();
         
         if (!students) {
-            throw new Error('Failed to load students');
+            students = [];
+            console.warn('No students data received from API');
         }
 
         updateStudentsTable();
+        console.log(`Loaded ${students.length} students`);
 
         hideLoading('studentsTableContainer');
     } catch (error) {
         console.error('Error loading students:', error);
-        showError('Failed to load students data');
+        showError('Failed to load students data: ' + error.message);
         hideLoading('studentsTableContainer');
     }
 }
@@ -274,9 +294,13 @@ async function viewStudentDetails(studentId) {
 }
 
 function closeModal(modalId) {
+    console.log(`Closing modal: ${modalId}`);
     const modal = document.getElementById(modalId);
     if (modal) {
+        // For modals added to DOM with insertAdjacentHTML, we need to remove them
         modal.remove();
+    } else {
+        console.warn(`Modal ${modalId} not found in DOM`);
     }
 }
 
@@ -651,18 +675,26 @@ async function loadClasses() {
     try {
         showLoading('classesTableContainer', 'Loading classes data...');
 
-        classes = await ApiService.getClasses();
+        const response = await fetch(`${API_BASE_URL}/classes`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load classes: ${response.status}`);
+        }
+        
+        classes = await response.json();
         
         if (!classes) {
-            throw new Error('Failed to load classes');
+            classes = [];
+            console.warn('No classes data received from API');
         }
 
         updateClassesTable();
+        console.log(`Loaded ${classes.length} classes`);
 
         hideLoading('classesTableContainer');
     } catch (error) {
         console.error('Error loading classes:', error);
-        showError('Failed to load classes data');
+        showError('Failed to load classes data: ' + error.message);
         hideLoading('classesTableContainer');
     }
 }
@@ -716,15 +748,15 @@ function updateClassesTable() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const addClassBtn = document.getElementById('addClassBtn');
-    if (addClassBtn) {
-        addClassBtn.addEventListener('click', showAddClassForm);
-    }
-});
+// Event listeners are now initialized in the initializeEventListeners function
 
 async function addClass() {
+    console.log("Adding class");
     const addButton = document.querySelector('#addClassModal .button.is-success');
+    if (!addButton) {
+        console.error("Add button not found in modal");
+        return;
+    }
     const originalText = addButton.textContent;
     addButton.disabled = true;
     addButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Adding...</span>';
@@ -785,6 +817,7 @@ async function addClass() {
 }
 
 function showAddClassForm() {
+    console.log("Showing add class form");
     const modalHTML = `
         <div class="modal is-active" id="addClassModal">
             <div class="modal-background"></div>
@@ -838,7 +871,7 @@ function showAddClassForm() {
                     </div>
                 </section>
                 <footer class="modal-card-foot">
-                    <button class="button is-success" onclick="addClass()">Add Class</button>
+                    <button class="button is-success" id="addClassButton" onclick="addClass()">Add Class</button>
                     <button class="button" onclick="closeModal('addClassModal')">Cancel</button>
                 </footer>
             </div>
@@ -1202,27 +1235,50 @@ async function rejectRequest(requestId) {
 
 async function loadAttendanceForClass(classId) {
     try {
+        // Find class in loaded classes
         activeClass = classes.find(c => c.id == classId);
-        if (!activeClass) return;
+        if (!activeClass) {
+            // If class not found, try to fetch it directly
+            try {
+                const classResponse = await fetch(`${API_BASE_URL}/classes/${classId}`);
+                if (classResponse.ok) {
+                    activeClass = await classResponse.json();
+                } else {
+                    console.error(`Failed to fetch class with ID ${classId}`);
+                    throw new Error('Class not found');
+                }
+            } catch (e) {
+                console.error('Error fetching class details:', e);
+                throw new Error('Class not found');
+            }
+        }
 
         showLoading('attendanceContent', `Loading attendance for ${activeClass.name}...`);
 
+        // Fetch students in this class
         const studentResponse = await fetch(`${API_BASE_URL}/classes/${classId}/students`);
         if (!studentResponse.ok) {
             throw new Error('Failed to load students for this class');
         }
 
         const students = await studentResponse.json();
+        console.log(`Loaded ${students.length} students for class ${classId}`);
 
+        // Get today's date in ISO format
         const today = new Date().toISOString().slice(0, 10);
 
+        // Fetch attendance records for this class and date
         const attendanceResponse = await fetch(`${API_BASE_URL}/attendance/class/${classId}/date/${today}`);
         let todayAttendance = [];
 
         if (attendanceResponse.ok) {
             todayAttendance = await attendanceResponse.json();
+            console.log(`Loaded ${todayAttendance.length} attendance records for ${today}`);
+        } else {
+            console.warn(`No attendance records found for class ${classId} on ${today}`);
         }
 
+        // Update attendance data
         attendanceData = {
             classId: classId,
             date: today,
@@ -1235,7 +1291,7 @@ async function loadAttendanceForClass(classId) {
         hideLoading('attendanceContent');
     } catch (error) {
         console.error('Error loading attendance:', error);
-        showError('Failed to load attendance data');
+        showError('Failed to load attendance data: ' + error.message);
         hideLoading('attendanceContent');
     }
 }
@@ -1504,7 +1560,43 @@ document.addEventListener('DOMContentLoaded', function () {
 function logout() {
     if (confirm('Are you sure you want to log out?')) {
         auth.clearAuth();
-
-        window.location.href = 'index.html';
+        
+        // Use window.location.replace to prevent back button from coming back to dashboard
+        window.location.replace('login.html');
     }
+}
+
+// Expose functions to window for HTML access
+window.logout = logout;
+
+function initializeEventListeners() {
+    console.log('Setting up event listeners');
+    
+    // Add class button click handler
+    const addClassBtn = document.getElementById('addClassBtn');
+    if (addClassBtn) {
+        addClassBtn.addEventListener('click', showAddClassForm);
+        console.log('Add class button event listener added');
+    } else {
+        console.error('Add class button not found in the DOM');
+    }
+    
+    // Other global event listeners for the admin dashboard
+    const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    if (navbarBurgers.length > 0) {
+        navbarBurgers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.dataset.target;
+                const $target = document.getElementById(target);
+                
+                el.classList.toggle('is-active');
+                if ($target) {
+                    $target.classList.toggle('is-active');
+                }
+            });
+        });
+    }
+    
+    // Set up search listeners
+    setupSearchListeners();
 }
