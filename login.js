@@ -3,72 +3,86 @@
  * Handles authentication for both students and administrators
  */
 
-// Mock user data for demonstration
-// In a real application, this would be verified against a database
-const adminUsers = [
-    { username: "admin", password: "admin123" }
-];
-
-// Some sample student accounts
-const studentUsers = [
-    { id: "STU001", password: "student123" },
-    { id: "STU002", password: "student123" },
-    { id: "STU003", password: "student123" }
-];
-
 // Login handling logic
-function login() {
+async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const userType = document.querySelector('input[name="userType"]:checked').value;
 
     if (!username || !password) {
-        alert('Please enter username and password');
+        showError('Please enter username and password');
         return;
     }
 
-    // For front-end demonstration (will connect to backend later)
-    if (userType === 'admin') {
-        // Check admin credentials (mock)
-        const adminUser = adminUsers.find(admin => admin.username === username && admin.password === password);
+    // Show loading state
+    const loginBtn = document.getElementById('loginBtn');
+    const originalBtnText = loginBtn.innerHTML;
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Logging in...</span>';
+    
+    try {
+        // Call the API for authentication
+        const response = await fetch(`${API_BASE_URL}/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
         
-        if (adminUser) {
-            // Store user info in local storage
-            localStorage.setItem('userType', 'admin');
-            localStorage.setItem('username', username);
-            
-            // Redirect to admin dashboard
+        if (!response.ok) {
+            throw new Error('Authentication failed');
+        }
+        
+        const data = await response.json();
+        
+        // Check if the user role matches the selected type
+        if ((userType === 'admin' && data.role !== 'ADMIN') || 
+            (userType === 'student' && data.role !== 'STUDENT')) {
+            showError(`Invalid credentials for ${userType} login`);
+            return;
+        }
+        
+        // Store authentication data using the auth object from app.js
+        auth.setAuth({
+            role: data.role,
+            userId: data.userId,
+            studentId: data.studentId
+        });
+        
+        // Redirect to the appropriate dashboard
+        if (data.role === 'ADMIN') {
             window.location.href = 'admin_dashboard.html';
         } else {
-            alert('Invalid admin credentials. Please try again.');
-        }
-    } else {
-        // Student login (mock)
-        const studentUser = studentUsers.find(student => student.id === username && student.password === password);
-        
-        if (studentUser) {
-            // Store user info in local storage
-            localStorage.setItem('userType', 'student');
-            localStorage.setItem('studentId', username);
-            
-            // Redirect to student dashboard
             window.location.href = 'student_dashboard.html';
-        } else {
-            alert('Invalid student credentials. Please try again.');
         }
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('Invalid credentials. Please try again.');
+    } finally {
+        // Restore button state
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = originalBtnText;
     }
+}
+
+// Display error message
+function showError(message) {
+    const errorDiv = document.getElementById('loginError');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    
+    // Hide the message after 5 seconds
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
 }
 
 // Check if user is already logged in
 function checkLoggedInStatus() {
-    const userType = localStorage.getItem('userType');
-    
-    if (userType) {
-        if (userType === 'admin') {
-            window.location.href = 'admin_dashboard.html';
-        } else {
-            window.location.href = 'student_dashboard.html';
-        }
+    // Use the auth object from app.js
+    if (auth.checkAuth()) {
+        auth.redirectBasedOnRole();
     }
 }
 
@@ -91,4 +105,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set focus to username field
     document.getElementById('username').focus();
+    
+    // Add event listeners for tab switching
+    const studentTabLink = document.getElementById('studentTabLink');
+    const adminTabLink = document.getElementById('adminTabLink');
+    const studentLoginFields = document.getElementById('studentLoginFields');
+    const adminLoginFields = document.getElementById('adminLoginFields');
+    
+    if (studentTabLink && adminTabLink) {
+        studentTabLink.addEventListener('click', function() {
+            studentTabLink.classList.add('is-active');
+            adminTabLink.classList.remove('is-active');
+            studentLoginFields.style.display = 'block';
+            adminLoginFields.style.display = 'none';
+        });
+        
+        adminTabLink.addEventListener('click', function() {
+            adminTabLink.classList.add('is-active');
+            studentTabLink.classList.remove('is-active');
+            adminLoginFields.style.display = 'block';
+            studentLoginFields.style.display = 'none';
+        });
+    }
+    
+    // Add form submission handler
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            login();
+        });
+    }
 });

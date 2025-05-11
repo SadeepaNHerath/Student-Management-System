@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Management - Login</title>
 
-    <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <section class="hero is-primary is-fullheight">
         <div class="hero-body">
@@ -19,34 +20,39 @@
                     <div class="column is-5-tablet is-4-desktop is-3-widescreen" data-aos="fade-up">
                         <div class="box">
                             <h3 class="title is-4 has-text-centered mb-5">Student Management System</h3>
-                            
+
                             <div class="has-text-centered mb-5">
                                 <figure class="image is-96x96 is-inline-block">
                                     <img src="img src/profile-pic.png" alt="User Avatar" class="is-rounded">
                                 </figure>
                             </div>
-                            
-                            <form>
+                            <div id="loginError" class="notification is-danger" style="display: none;">
+                                Invalid username or password
+                            </div>
+
+                            <form id="loginForm">
                                 <div class="field">
                                     <label class="label">Username</label>
                                     <div class="control has-icons-left">
-                                        <input class="input" type="text" id="username" placeholder="Username or ID" required>
+                                        <input class="input" type="text" id="username" placeholder="Username or ID"
+                                            required>
                                         <span class="icon is-small is-left">
                                             <i class="fas fa-user"></i>
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 <div class="field">
                                     <label class="label">Password</label>
                                     <div class="control has-icons-left">
-                                        <input class="input" type="password" id="password" placeholder="Password" required>
+                                        <input class="input" type="password" id="password" placeholder="Password"
+                                            required>
                                         <span class="icon is-small is-left">
                                             <i class="fas fa-lock"></i>
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 <div class="field">
                                     <div class="control">
                                         <label class="radio">
@@ -59,30 +65,38 @@
                                         </label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="field mt-5">
                                     <div class="control">
-                                        <button class="button is-primary is-fullwidth" type="button" onclick="login()">
-                                            Login
+                                        <button id="loginBtn" class="button is-primary is-fullwidth" type="submit">
+                                            <span class="icon">
+                                                <i class="fas fa-sign-in-alt"></i>
+                                            </span>
+                                            <span>Login</span>
                                         </button>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                        
+
                         <p class="has-text-centered has-text-white mt-4">
-                            <small>For administrators only. Students can only login with credentials provided by admin.</small>
+                            <small>For administrators only. Students can only login with credentials provided by
+                                admin.</small>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="app.js"></script>
     <script src="login.js"></script>
     <script>
         AOS.init();
+        document.addEventListener('DOMContentLoaded', function () {
+            checkLoggedInStatus();
+        });
     </script>
 </body>
+
 </html>

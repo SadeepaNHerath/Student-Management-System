@@ -25,56 +25,56 @@ let students = [
 ];
 
 let requests = [
-    { 
-        id: "REQ001", 
-        studentId: "STU001", 
-        classId: "CLS003", 
-        date: "2025-05-08", 
+    {
+        id: "REQ001",
+        studentId: "STU001",
+        classId: "CLS003",
+        date: "2025-05-08",
         status: "pending",
         message: "I'm interested in learning database design to complement my web development skills.",
         feedback: ""
     },
-    { 
-        id: "REQ002", 
-        studentId: "STU002", 
-        classId: "CLS003", 
-        date: "2025-05-07", 
+    {
+        id: "REQ002",
+        studentId: "STU002",
+        classId: "CLS003",
+        date: "2025-05-07",
         status: "approved",
         message: "I want to join this class to improve my database knowledge.",
         feedback: "Approved! Looking forward to having you in the class."
     },
-    { 
-        id: "REQ003", 
-        studentId: "STU003", 
-        classId: "CLS002", 
-        date: "2025-05-06", 
+    {
+        id: "REQ003",
+        studentId: "STU003",
+        classId: "CLS002",
+        date: "2025-05-06",
         status: "rejected",
         message: "I need to learn Java to advance in my career.",
         feedback: "Sorry, the class is currently full. Please try again for the next session."
     },
-    { 
-        id: "REQ004", 
-        studentId: "STU004", 
-        classId: "CLS004", 
-        date: "2025-05-05", 
+    {
+        id: "REQ004",
+        studentId: "STU004",
+        classId: "CLS004",
+        date: "2025-05-05",
         status: "pending",
         message: "I'm interested in mobile development and would like to join this class.",
         feedback: ""
     },
-    { 
-        id: "REQ005", 
-        studentId: "STU005", 
-        classId: "CLS001", 
-        date: "2025-05-04", 
+    {
+        id: "REQ005",
+        studentId: "STU005",
+        classId: "CLS001",
+        date: "2025-05-04",
         status: "pending",
         message: "I need to learn web development for my project.",
         feedback: ""
     },
-    { 
-        id: "REQ006", 
-        studentId: "STU006", 
-        classId: "CLS005", 
-        date: "2025-05-03", 
+    {
+        id: "REQ006",
+        studentId: "STU006",
+        classId: "CLS005",
+        date: "2025-05-03",
         status: "approved",
         message: "I want to learn Python for data science to advance my career.",
         feedback: "Welcome to the class! We're excited to have you."
@@ -84,10 +84,10 @@ let requests = [
 let selectedRequests = [];
 
 // Initialize when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Populate class dropdown
     populateClassDropdown();
-    
+
     // Load requests with default filter (pending)
     filterRequests();
 });
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Populate class dropdown
 function populateClassDropdown() {
     const classFilter = document.getElementById('classFilter');
-    
+
     classes.forEach(cls => {
         const option = document.createElement('option');
         option.value = cls.id;
@@ -109,43 +109,43 @@ function filterRequests() {
     const statusFilter = document.getElementById('statusFilter').value;
     const classFilter = document.getElementById('classFilter').value;
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
+
     // Reset selected requests
     selectedRequests = [];
     document.getElementById('selectAllCheckbox').checked = false;
     updateBulkActionControls();
-    
+
     // Apply filters
     let filteredRequests = requests;
-    
+
     if (statusFilter !== 'all') {
         filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
     }
-    
+
     if (classFilter) {
         filteredRequests = filteredRequests.filter(req => req.classId === classFilter);
     }
-    
+
     if (searchTerm) {
         filteredRequests = filteredRequests.filter(req => {
             const student = students.find(s => s.id === req.studentId);
             if (!student) return false;
-            
+
             const studentFullName = `${student.firstName} ${student.lastName}`.toLowerCase();
             return studentFullName.includes(searchTerm) || req.studentId.toLowerCase().includes(searchTerm);
         });
     }
-    
+
     // Update the request count
     document.getElementById('requestCount').textContent = filteredRequests.length;
-    
+
     // Display requests or show no results message
     if (filteredRequests.length === 0) {
         document.getElementById('noRequestsMessage').style.display = 'block';
     } else {
         document.getElementById('noRequestsMessage').style.display = 'none';
     }
-    
+
     // Populate the table
     populateRequestsTable(filteredRequests);
 }
@@ -154,22 +154,22 @@ function filterRequests() {
 function populateRequestsTable(filteredRequests) {
     const tableBody = document.getElementById('requestsTableBody');
     tableBody.innerHTML = '';
-    
+
     if (filteredRequests.length === 0) {
         return;
     }
-    
+
     filteredRequests.forEach(request => {
         const row = document.createElement('tr');
-        
+
         // Get student name from ID
         const student = students.find(s => s.id === request.studentId);
         const studentName = student ? `${student.firstName} ${student.lastName}` : request.studentId;
-        
+
         // Get class name from ID
         const classObj = classes.find(c => c.id === request.classId);
         const className = classObj ? classObj.name : request.classId;
-        
+
         // Create status badge based on status
         let statusBadge = '';
         if (request.status === 'pending') {
@@ -179,7 +179,7 @@ function populateRequestsTable(filteredRequests) {
         } else if (request.status === 'rejected') {
             statusBadge = '<span class="tag is-danger">Rejected</span>';
         }
-        
+
         row.innerHTML = `
             <td>
                 <label class="checkbox">
@@ -210,7 +210,7 @@ function populateRequestsTable(filteredRequests) {
                 </div>
             </td>
         `;
-        
+
         tableBody.appendChild(row);
     });
 }
@@ -225,17 +225,17 @@ function formatDate(dateString) {
 function toggleSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     const checkboxes = document.querySelectorAll('.request-checkbox:not([disabled])');
-    
+
     checkboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
-        
+
         if (selectAllCheckbox.checked && !selectedRequests.includes(checkbox.value)) {
             selectedRequests.push(checkbox.value);
         } else if (!selectAllCheckbox.checked) {
             selectedRequests = selectedRequests.filter(id => id !== checkbox.value);
         }
     });
-    
+
     updateBulkActionControls();
 }
 
@@ -246,7 +246,7 @@ function updateSelectedRequests(checkbox) {
     } else if (!checkbox.checked) {
         selectedRequests = selectedRequests.filter(id => id !== checkbox.value);
     }
-    
+
     updateBulkActionControls();
 }
 
@@ -254,7 +254,7 @@ function updateSelectedRequests(checkbox) {
 function updateBulkActionControls() {
     const bulkActionControls = document.getElementById('bulkActionControls');
     const selectedCount = document.getElementById('selectedCount');
-    
+
     if (selectedRequests.length > 0) {
         bulkActionControls.style.display = 'flex';
         selectedCount.textContent = selectedRequests.length;
@@ -267,15 +267,15 @@ function updateBulkActionControls() {
 function viewRequestDetails(requestId) {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
-    
+
     // Get student name from ID
     const student = students.find(s => s.id === request.studentId);
     const studentName = student ? `${student.firstName} ${student.lastName}` : request.studentId;
-    
+
     // Get class name from ID
     const classObj = classes.find(c => c.id === request.classId);
     const className = classObj ? classObj.name : request.classId;
-    
+
     // Create status badge based on status
     let statusBadge = '';
     if (request.status === 'pending') {
@@ -285,7 +285,7 @@ function viewRequestDetails(requestId) {
     } else if (request.status === 'rejected') {
         statusBadge = '<span class="tag is-danger">Rejected</span>';
     }
-    
+
     // Fill modal content
     const content = document.getElementById('requestDetailsContent');
     content.innerHTML = `
@@ -345,10 +345,10 @@ function viewRequestDetails(requestId) {
             ` : ''}
         </div>
     `;
-    
+
     // Setup action buttons
     const actionButtons = document.getElementById('requestActionButtons');
-    
+
     if (request.status === 'pending') {
         actionButtons.innerHTML = `
             <button class="button is-success mr-2" onclick="approveRequestWithFeedback('${request.id}')">
@@ -367,7 +367,7 @@ function viewRequestDetails(requestId) {
     } else {
         actionButtons.innerHTML = '';
     }
-    
+
     // Show modal
     document.getElementById('requestDetailsModal').classList.add('is-active');
 }
@@ -381,13 +381,13 @@ function closeRequestDetailsModal() {
 function approveRequest(requestId) {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
-    
+
     request.status = 'approved';
     request.feedback = "Request approved.";
-    
+
     // Refresh the table
     filterRequests();
-    
+
     alert(`Request ${requestId} has been approved.`);
 }
 
@@ -395,13 +395,13 @@ function approveRequest(requestId) {
 function rejectRequest(requestId) {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
-    
+
     request.status = 'rejected';
     request.feedback = "Request rejected.";
-    
+
     // Refresh the table
     filterRequests();
-    
+
     alert(`Request ${requestId} has been rejected.`);
 }
 
@@ -409,7 +409,7 @@ function rejectRequest(requestId) {
 function approveRequestWithFeedback(requestId) {
     // Close the details modal
     closeRequestDetailsModal();
-    
+
     // Open the feedback modal
     document.getElementById('feedbackModalTitle').textContent = 'Approve Request';
     document.getElementById('feedbackMessage').value = "Approved! Welcome to the class.";
@@ -418,7 +418,7 @@ function approveRequestWithFeedback(requestId) {
     document.getElementById('submitFeedbackBtn').classList.remove('is-danger');
     document.getElementById('submitFeedbackBtn').classList.add('is-success');
     document.getElementById('submitFeedbackBtn').textContent = 'Approve';
-    
+
     document.getElementById('addFeedbackModal').classList.add('is-active');
 }
 
@@ -426,7 +426,7 @@ function approveRequestWithFeedback(requestId) {
 function rejectRequestWithFeedback(requestId) {
     // Close the details modal
     closeRequestDetailsModal();
-    
+
     // Open the feedback modal
     document.getElementById('feedbackModalTitle').textContent = 'Reject Request';
     document.getElementById('feedbackMessage').value = "We're sorry, but your request has been rejected.";
@@ -435,7 +435,7 @@ function rejectRequestWithFeedback(requestId) {
     document.getElementById('submitFeedbackBtn').classList.remove('is-success');
     document.getElementById('submitFeedbackBtn').classList.add('is-danger');
     document.getElementById('submitFeedbackBtn').textContent = 'Reject';
-    
+
     document.getElementById('addFeedbackModal').classList.add('is-active');
 }
 
@@ -449,20 +449,20 @@ function submitFeedback() {
     const requestId = document.getElementById('feedbackRequestId').value;
     const action = document.getElementById('feedbackAction').value;
     const feedback = document.getElementById('feedbackMessage').value;
-    
+
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
-    
+
     // Update request status and feedback
     request.status = action === 'approve' ? 'approved' : 'rejected';
     request.feedback = feedback;
-    
+
     // Close modal
     closeFeedbackModal();
-    
+
     // Refresh the table
     filterRequests();
-    
+
     alert(`Request ${requestId} has been ${action === 'approve' ? 'approved' : 'rejected'}.`);
 }
 
@@ -470,7 +470,7 @@ function submitFeedback() {
 function approveAllPending() {
     if (confirm('Are you sure you want to approve all pending requests?')) {
         let count = 0;
-        
+
         requests.forEach(request => {
             if (request.status === 'pending') {
                 request.status = 'approved';
@@ -478,10 +478,10 @@ function approveAllPending() {
                 count++;
             }
         });
-        
+
         // Refresh the table
         filterRequests();
-        
+
         alert(`${count} pending requests have been approved.`);
     }
 }
@@ -492,7 +492,7 @@ function bulkApprove() {
         alert('No requests selected.');
         return;
     }
-    
+
     if (confirm(`Are you sure you want to approve ${selectedRequests.length} selected requests?`)) {
         selectedRequests.forEach(requestId => {
             const request = requests.find(r => r.id === requestId);
@@ -501,13 +501,13 @@ function bulkApprove() {
                 request.feedback = 'Bulk approved.';
             }
         });
-        
+
         // Reset selected requests
         selectedRequests = [];
-        
+
         // Refresh the table
         filterRequests();
-        
+
         alert('Selected requests have been approved.');
     }
 }
@@ -518,7 +518,7 @@ function bulkReject() {
         alert('No requests selected.');
         return;
     }
-    
+
     if (confirm(`Are you sure you want to reject ${selectedRequests.length} selected requests?`)) {
         selectedRequests.forEach(requestId => {
             const request = requests.find(r => r.id === requestId);
@@ -527,13 +527,13 @@ function bulkReject() {
                 request.feedback = 'Bulk rejected.';
             }
         });
-        
+
         // Reset selected requests
         selectedRequests = [];
-        
+
         // Refresh the table
         filterRequests();
-        
+
         alert('Selected requests have been rejected.');
     }
 }

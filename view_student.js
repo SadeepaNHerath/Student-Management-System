@@ -156,7 +156,7 @@ function deleteStudent(id) {
         });
 }
 
-function editStudent(){
+function editStudent() {
 
 
 }

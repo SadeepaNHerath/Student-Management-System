@@ -19,7 +19,7 @@ async function addStudent() {
             contact: contact.value
         };
 
-        
+
         const formData = new FormData();
         formData.append('student', new Blob([JSON.stringify(student)], { type: 'application/json' }));
         formData.append('profilePic', fileInput.files[0]);

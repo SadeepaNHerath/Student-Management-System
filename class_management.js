@@ -8,55 +8,55 @@
 
 // Mock data for demonstration - In a real app, this would come from the backend
 let classes = [
-    { 
-        id: "CLS001", 
-        name: "Web Development", 
+    {
+        id: "CLS001",
+        name: "Web Development",
         description: "Learn HTML, CSS, JavaScript, and modern front-end frameworks to build responsive websites and web applications.",
-        startDate: "2025-01-15", 
+        startDate: "2025-01-15",
         endDate: "2025-06-15",
         schedule: "Mon, Wed 10:00-12:00",
         maxStudents: 25,
         enrolled: 18,
         status: "active"
     },
-    { 
-        id: "CLS002", 
-        name: "Java Programming", 
+    {
+        id: "CLS002",
+        name: "Java Programming",
         description: "Comprehensive course covering Core Java and Spring Boot for enterprise application development.",
-        startDate: "2025-02-01", 
+        startDate: "2025-02-01",
         endDate: "2025-07-01",
         schedule: "Tue, Thu 14:00-16:00",
         maxStudents: 20,
         enrolled: 15,
         status: "active"
     },
-    { 
-        id: "CLS003", 
-        name: "Database Design", 
+    {
+        id: "CLS003",
+        name: "Database Design",
         description: "Learn SQL fundamentals, database normalization, and database management principles.",
-        startDate: "2025-03-15", 
+        startDate: "2025-03-15",
         endDate: "2025-08-15",
         schedule: "Fri 09:00-13:00",
         maxStudents: 15,
         enrolled: 10,
         status: "upcoming"
     },
-    { 
-        id: "CLS004", 
-        name: "Mobile App Development", 
+    {
+        id: "CLS004",
+        name: "Mobile App Development",
         description: "Introduction to Android and iOS development using modern frameworks.",
-        startDate: "2025-06-01", 
+        startDate: "2025-06-01",
         endDate: "2025-11-01",
         schedule: "Mon, Wed 14:00-16:00",
         maxStudents: 20,
         enrolled: 0,
         status: "upcoming"
     },
-    { 
-        id: "CLS005", 
-        name: "Python for Data Science", 
+    {
+        id: "CLS005",
+        name: "Python for Data Science",
         description: "Python programming with focus on data analysis, visualization, and machine learning basics.",
-        startDate: "2024-09-01", 
+        startDate: "2024-09-01",
         endDate: "2025-02-01",
         schedule: "Tue, Thu 09:00-11:00",
         maxStudents: 30,
@@ -78,7 +78,7 @@ let students = [
 let currentClassId = "";
 
 // Initialize when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadClasses();
 });
 
@@ -86,13 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadClasses(filter = 'all') {
     const container = document.getElementById('classesContainer');
     container.innerHTML = '';
-    
+
     // Apply filter
     let filteredClasses = classes;
     if (filter !== 'all') {
         filteredClasses = classes.filter(cls => cls.status === filter);
     }
-    
+
     if (filteredClasses.length === 0) {
         container.innerHTML = `
             <div class="column is-full">
@@ -103,16 +103,16 @@ function loadClasses(filter = 'all') {
         `;
         return;
     }
-    
+
     filteredClasses.forEach(cls => {
         const classCard = document.createElement('div');
         classCard.className = 'column is-4';
-        
+
         // Determine class card color based on status
         let cardColorClass = 'is-primary';
         if (cls.status === 'upcoming') cardColorClass = 'is-info';
         else if (cls.status === 'completed') cardColorClass = 'is-dark';
-        
+
         classCard.innerHTML = `
             <div class="card">
                 <header class="card-header has-background-${cardColorClass} has-text-white">
@@ -145,7 +145,7 @@ function loadClasses(filter = 'all') {
                 </footer>
             </div>
         `;
-        
+
         container.appendChild(classCard);
     });
 }
@@ -154,28 +154,28 @@ function filterClasses(status) {
     // Update active tab
     document.querySelectorAll('.tabs li').forEach(li => li.classList.remove('is-active'));
     document.querySelector(`.tabs li a[onclick="filterClasses('${status}')"]`).parentElement.classList.add('is-active');
-    
+
     // Load classes with filter
     loadClasses(status);
 }
 
 function searchClasses() {
     const searchTerm = document.getElementById('classSearchInput').value.toLowerCase();
-    
+
     if (!searchTerm) {
         loadClasses();
         return;
     }
-    
+
     const container = document.getElementById('classesContainer');
     container.innerHTML = '';
-    
+
     // Filter classes by search term
-    const filteredClasses = classes.filter(cls => 
-        cls.name.toLowerCase().includes(searchTerm) || 
+    const filteredClasses = classes.filter(cls =>
+        cls.name.toLowerCase().includes(searchTerm) ||
         cls.description.toLowerCase().includes(searchTerm)
     );
-    
+
     if (filteredClasses.length === 0) {
         container.innerHTML = `
             <div class="column is-full">
@@ -186,17 +186,17 @@ function searchClasses() {
         `;
         return;
     }
-    
+
     // Display filtered classes
     filteredClasses.forEach(cls => {
         const classCard = document.createElement('div');
         classCard.className = 'column is-4';
-        
+
         // Determine class card color based on status
         let cardColorClass = 'is-primary';
         if (cls.status === 'upcoming') cardColorClass = 'is-info';
         else if (cls.status === 'completed') cardColorClass = 'is-dark';
-        
+
         classCard.innerHTML = `
             <div class="card">
                 <header class="card-header has-background-${cardColorClass} has-text-white">
@@ -229,7 +229,7 @@ function searchClasses() {
                 </footer>
             </div>
         `;
-        
+
         container.appendChild(classCard);
     });
 }
@@ -238,12 +238,12 @@ function searchClasses() {
 function viewClassDetails(classId) {
     currentClassId = classId;
     const selectedClass = classes.find(cls => cls.id === classId);
-    
+
     if (!selectedClass) return;
-    
+
     // Set modal title
     document.getElementById('modalClassTitle').textContent = selectedClass.name;
-    
+
     // Fill modal content
     const content = document.getElementById('classDetailsContent');
     content.innerHTML = `
@@ -277,7 +277,7 @@ function viewClassDetails(classId) {
             </div>
         </div>
     `;
-    
+
     // Show the modal
     document.getElementById('classDetailsModal').classList.add('is-active');
 }
@@ -292,7 +292,7 @@ function showAddClassModal() {
     // Set modal for adding a new class
     document.getElementById('addEditClassTitle').textContent = 'Add New Class';
     document.getElementById('saveClassBtn').textContent = 'Add Class';
-    
+
     // Clear form fields
     document.getElementById('className').value = '';
     document.getElementById('classDescription').value = '';
@@ -301,20 +301,20 @@ function showAddClassModal() {
     document.getElementById('classSchedule').value = '';
     document.getElementById('classMaxStudents').value = '';
     document.getElementById('classId').value = '';
-    
+
     // Show the modal
     document.getElementById('addEditClassModal').classList.add('is-active');
 }
 
 function editClass(classId) {
     const selectedClass = classes.find(cls => cls.id === classId);
-    
+
     if (!selectedClass) return;
-    
+
     // Set modal for editing
     document.getElementById('addEditClassTitle').textContent = 'Edit Class';
     document.getElementById('saveClassBtn').textContent = 'Save Changes';
-    
+
     // Fill form fields
     document.getElementById('className').value = selectedClass.name;
     document.getElementById('classDescription').value = selectedClass.description;
@@ -323,7 +323,7 @@ function editClass(classId) {
     document.getElementById('classSchedule').value = selectedClass.schedule;
     document.getElementById('classMaxStudents').value = selectedClass.maxStudents;
     document.getElementById('classId').value = classId;
-    
+
     // Show the modal
     document.getElementById('addEditClassModal').classList.add('is-active');
 }
@@ -349,12 +349,12 @@ function saveClass() {
     const schedule = document.getElementById('classSchedule').value;
     const maxStudents = document.getElementById('classMaxStudents').value;
     const classId = document.getElementById('classId').value;
-    
+
     if (!name || !description || !startDate || !endDate || !schedule || !maxStudents) {
         alert('Please fill all fields');
         return;
     }
-    
+
     // Check if editing or adding
     if (classId) {
         // Editing existing class
@@ -362,7 +362,7 @@ function saveClass() {
         if (index !== -1) {
             // Determine status based on dates
             let status = determineClassStatus(startDate, endDate);
-            
+
             // Update class
             classes[index] = {
                 ...classes[index],
@@ -374,17 +374,17 @@ function saveClass() {
                 maxStudents: parseInt(maxStudents),
                 status
             };
-            
+
             alert('Class updated successfully!');
         }
     } else {
         // Adding new class
         // Generate a new class ID
         const newId = `CLS${String(classes.length + 1).padStart(3, '0')}`;
-        
+
         // Determine status based on dates
         let status = determineClassStatus(startDate, endDate);
-        
+
         // Create new class object
         const newClass = {
             id: newId,
@@ -397,16 +397,16 @@ function saveClass() {
             enrolled: 0,
             status
         };
-        
+
         // Add to classes array
         classes.push(newClass);
-        
+
         alert('Class added successfully!');
     }
-    
+
     // Close the modal
     closeAddEditClassModal();
-    
+
     // Reload the classes
     loadClasses();
 }
@@ -415,7 +415,7 @@ function determineClassStatus(startDate, endDate) {
     const currentDate = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     if (currentDate < start) {
         return 'upcoming';
     } else if (currentDate > end) {
@@ -435,13 +435,13 @@ function confirmDeleteClass() {
 function deleteClass(classId) {
     // Remove the class
     classes = classes.filter(cls => cls.id !== classId);
-    
+
     // Close the modal
     closeClassDetailsModal();
-    
+
     // Update the UI
     loadClasses();
-    
+
     alert('Class deleted successfully!');
 }
 
@@ -449,18 +449,18 @@ function deleteClass(classId) {
 function openManageStudents(classId) {
     currentClassId = classId;
     const selectedClass = classes.find(cls => cls.id === classId);
-    
+
     if (!selectedClass) return;
-    
+
     // Set modal title
     document.getElementById('manageStudentsTitle').textContent = `Manage Students - ${selectedClass.name}`;
-    
+
     // Load enrolled students
     loadEnrolledStudents(classId);
-    
+
     // Reset tab to enrolled students
     document.querySelector('[data-tab="enrolled-students"]').click();
-    
+
     // Show the modal
     document.getElementById('manageStudentsModal').classList.add('is-active');
 }
@@ -468,12 +468,12 @@ function openManageStudents(classId) {
 function loadEnrolledStudents(classId) {
     const tableBody = document.getElementById('enrolledStudentsTableBody');
     tableBody.innerHTML = '';
-    
+
     // Get students enrolled in this class
-    const enrolledStudentsList = students.filter(student => 
+    const enrolledStudentsList = students.filter(student =>
         student.enrolledClasses.includes(classId)
     );
-    
+
     if (enrolledStudentsList.length === 0) {
         tableBody.innerHTML = `
             <tr>
@@ -482,10 +482,10 @@ function loadEnrolledStudents(classId) {
         `;
         return;
     }
-    
+
     enrolledStudentsList.forEach(student => {
         const row = document.createElement('tr');
-        
+
         row.innerHTML = `
             <td>${student.id}</td>
             <td>${student.firstName} ${student.lastName}</td>
@@ -505,7 +505,7 @@ function loadEnrolledStudents(classId) {
                 </div>
             </td>
         `;
-        
+
         tableBody.appendChild(row);
     });
 }
@@ -514,24 +514,24 @@ function removeStudentFromClass(studentId) {
     if (confirm('Are you sure you want to remove this student from the class?')) {
         // Find the student
         const studentIndex = students.findIndex(student => student.id === studentId);
-        
+
         if (studentIndex !== -1) {
             // Remove the class from student's enrolled classes
             const classIndex = students[studentIndex].enrolledClasses.indexOf(currentClassId);
             if (classIndex !== -1) {
                 students[studentIndex].enrolledClasses.splice(classIndex, 1);
-                
+
                 // Update class enrollment count
                 const classIndex2 = classes.findIndex(cls => cls.id === currentClassId);
                 if (classIndex2 !== -1) {
                     classes[classIndex2].enrolled--;
                 }
-                
+
                 alert('Student removed from class successfully!');
-                
+
                 // Reload the students table
                 loadEnrolledStudents(currentClassId);
-                
+
                 // Reload the classes (to update enrollment count)
                 loadClasses();
             }
@@ -547,21 +547,21 @@ function searchStudentsToAdd() {
 function loadAvailableStudents(searchTerm = '') {
     const tableBody = document.getElementById('availableStudentsTableBody');
     tableBody.innerHTML = '';
-    
+
     // Get students not enrolled in this class
-    let availableStudentsList = students.filter(student => 
+    let availableStudentsList = students.filter(student =>
         !student.enrolledClasses.includes(currentClassId)
     );
-    
+
     // Apply search filter if provided
     if (searchTerm) {
-        availableStudentsList = availableStudentsList.filter(student => 
-            student.id.toLowerCase().includes(searchTerm) || 
-            student.firstName.toLowerCase().includes(searchTerm) || 
+        availableStudentsList = availableStudentsList.filter(student =>
+            student.id.toLowerCase().includes(searchTerm) ||
+            student.firstName.toLowerCase().includes(searchTerm) ||
             student.lastName.toLowerCase().includes(searchTerm)
         );
     }
-    
+
     if (availableStudentsList.length === 0) {
         tableBody.innerHTML = `
             <tr>
@@ -570,10 +570,10 @@ function loadAvailableStudents(searchTerm = '') {
         `;
         return;
     }
-    
+
     availableStudentsList.forEach(student => {
         const row = document.createElement('tr');
-        
+
         row.innerHTML = `
             <td>${student.id}</td>
             <td>${student.firstName} ${student.lastName}</td>
@@ -587,7 +587,7 @@ function loadAvailableStudents(searchTerm = '') {
                 </div>
             </td>
         `;
-        
+
         tableBody.appendChild(row);
     });
 }
@@ -595,30 +595,30 @@ function loadAvailableStudents(searchTerm = '') {
 function addStudentToClass(studentId) {
     // Find the student
     const studentIndex = students.findIndex(student => student.id === studentId);
-    
+
     if (studentIndex !== -1) {
         // Find the class
         const classIndex = classes.findIndex(cls => cls.id === currentClassId);
-        
+
         if (classIndex !== -1) {
             // Check if class is full
             if (classes[classIndex].enrolled >= classes[classIndex].maxStudents) {
                 alert('This class is already at maximum capacity.');
                 return;
             }
-            
+
             // Add the class to student's enrolled classes
             students[studentIndex].enrolledClasses.push(currentClassId);
-            
+
             // Update class enrollment count
             classes[classIndex].enrolled++;
-            
+
             alert('Student added to class successfully!');
-            
+
             // Reload both student tables
             loadEnrolledStudents(currentClassId);
             loadAvailableStudents(document.getElementById('studentSearchInput').value.toLowerCase());
-            
+
             // Reload the classes (to update enrollment count)
             loadClasses();
         }

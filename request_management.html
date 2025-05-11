@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Requests</title>
 
-    <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
@@ -19,7 +20,7 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
             </a>
         </div>
-        
+
         <div class="navbar-menu">
             <div class="navbar-start">
                 <div class="navbar-item">
@@ -67,7 +68,8 @@
                         <div class="field">
                             <label class="label">Search</label>
                             <div class="control has-icons-left">
-                                <input class="input" type="text" id="searchInput" placeholder="Search by student name or ID" oninput="filterRequests()">
+                                <input class="input" type="text" id="searchInput"
+                                    placeholder="Search by student name or ID" oninput="filterRequests()">
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-search"></i>
                                 </span>
@@ -98,7 +100,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
@@ -121,7 +123,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="level mt-4" id="bulkActionControls" style="display: none;">
                     <div class="level-left">
                         <div class="level-item">
@@ -190,7 +192,8 @@
                 <div class="field">
                     <label class="label">Feedback Message</label>
                     <div class="control">
-                        <textarea class="textarea" id="feedbackMessage" placeholder="Enter feedback for the student..."></textarea>
+                        <textarea class="textarea" id="feedbackMessage"
+                            placeholder="Enter feedback for the student..."></textarea>
                     </div>
                 </div>
                 <input type="hidden" id="feedbackRequestId">
@@ -212,16 +215,20 @@
                 </div>
                 <div class="column has-text-right">
                     <div class="buttons is-right">
-                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                            target="_blank">
                             <span class="icon"><i class="fab fa-github"></i></span>
                         </a>
-                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-tiktok"></i></span>
                         </a>
-                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-instagram"></i></span>
                         </a>
-                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-facebook"></i></span>
                         </a>
                     </div>
@@ -236,4 +243,5 @@
         AOS.init();
     </script>
 </body>
+
 </html>

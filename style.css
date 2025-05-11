@@ -128,7 +128,8 @@
 .student-table img {
     border-radius: 50%;
 }
-  .profile-pic:hover .-label {
+
+.profile-pic:hover .-label {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -138,9 +139,10 @@
     transition: background-color 0.2s ease-in-out;
     border-radius: 100px;
     margin-bottom: 0;
-  }
-  .profile-pic span {
+}
+
+.profile-pic span {
     display: inline-flex;
     padding: 0.2em;
     height: 2em;
-  }
+}

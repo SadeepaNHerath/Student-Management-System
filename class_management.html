@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Management</title>
 
-    <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
@@ -19,7 +20,7 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
             </a>
         </div>
-        
+
         <div class="navbar-menu">
             <div class="navbar-start">
                 <div class="navbar-item">
@@ -49,7 +50,8 @@
                         <div class="level-item">
                             <div class="field has-addons">
                                 <div class="control">
-                                    <input class="input" type="text" placeholder="Search classes..." id="classSearchInput">
+                                    <input class="input" type="text" placeholder="Search classes..."
+                                        id="classSearchInput">
                                 </div>
                                 <div class="control">
                                     <button class="button is-info" onclick="searchClasses()">
@@ -144,13 +146,15 @@
                 <div class="field">
                     <label class="label">Schedule</label>
                     <div class="control">
-                        <input class="input" type="text" id="classSchedule" placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
+                        <input class="input" type="text" id="classSchedule"
+                            placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Max Students</label>
                     <div class="control">
-                        <input class="input" type="number" id="classMaxStudents" placeholder="Maximum number of students">
+                        <input class="input" type="number" id="classMaxStudents"
+                            placeholder="Maximum number of students">
                     </div>
                 </div>
                 <input type="hidden" id="classId">
@@ -177,7 +181,7 @@
                         <li><a data-tab="add-students">Add Students</a></li>
                     </ul>
                 </div>
-                
+
                 <div id="enrolled-students-tab">
                     <div class="table-container">
                         <table class="table is-fullwidth is-striped is-hoverable">
@@ -196,11 +200,12 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <div id="add-students-tab" style="display: none;">
                     <div class="field has-addons mb-4">
                         <div class="control is-expanded">
-                            <input class="input" type="text" placeholder="Search students by name or ID..." id="studentSearchInput">
+                            <input class="input" type="text" placeholder="Search students by name or ID..."
+                                id="studentSearchInput">
                         </div>
                         <div class="control">
                             <button class="button is-info" onclick="searchStudentsToAdd()">
@@ -210,7 +215,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="table-container">
                         <table class="table is-fullwidth is-striped is-hoverable">
                             <thead>
@@ -243,16 +248,20 @@
                 </div>
                 <div class="column has-text-right">
                     <div class="buttons is-right">
-                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                            target="_blank">
                             <span class="icon"><i class="fab fa-github"></i></span>
                         </a>
-                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-tiktok"></i></span>
                         </a>
-                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-instagram"></i></span>
                         </a>
-                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-facebook"></i></span>
                         </a>
                     </div>
@@ -265,19 +274,19 @@
     <script src="class_management.js"></script>
     <script>
         AOS.init();
-        
+
         // Tab switching
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const tabs = document.querySelectorAll('.tabs li');
             const tabContents = document.querySelectorAll('[id$="-tab"]');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabs.forEach(item => item.classList.remove('is-active'));
                     tab.classList.add('is-active');
-                    
+
                     const target = tab.querySelector('a').getAttribute('data-tab');
-                    
+
                     tabContents.forEach(content => {
                         if (content.id === target + '-tab') {
                             content.style.display = 'block';
@@ -290,4 +299,5 @@
         });
     </script>
 </body>
+
 </html>

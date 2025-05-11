@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Management</title>
 
-    <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
@@ -19,7 +20,7 @@
                 <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
             </a>
         </div>
-        
+
         <div class="navbar-menu">
             <div class="navbar-start">
                 <div class="navbar-item">
@@ -52,7 +53,8 @@
                         <div class="field">
                             <label class="label">Date</label>
                             <div class="control">
-                                <input class="input" type="date" id="attendanceDate" value="" onchange="loadAttendanceData()">
+                                <input class="input" type="date" id="attendanceDate" value=""
+                                    onchange="loadAttendanceData()">
                             </div>
                         </div>
                     </div>
@@ -130,7 +132,7 @@
             <!-- Attendance History -->
             <div class="box mt-5" data-aos="fade-up">
                 <h3 class="title is-4">Attendance History</h3>
-                
+
                 <div class="field has-addons mb-4">
                     <div class="control is-expanded">
                         <div class="select is-fullwidth">
@@ -148,7 +150,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
@@ -212,16 +214,20 @@
                 </div>
                 <div class="column has-text-right">
                     <div class="buttons is-right">
-                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                            target="_blank">
                             <span class="icon"><i class="fab fa-github"></i></span>
                         </a>
-                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-tiktok"></i></span>
                         </a>
-                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-instagram"></i></span>
                         </a>
-                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-facebook"></i></span>
                         </a>
                     </div>
@@ -236,4 +242,5 @@
         AOS.init();
     </script>
 </body>
+
 </html>

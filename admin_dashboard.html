@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
 
-    <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
@@ -41,7 +42,7 @@
                     Requests
                 </a>
             </div>
-            
+
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
@@ -66,8 +67,9 @@
                     <div class="level-left">
                         <div class="level-item">
                             <p>
-                                <strong>Welcome, Admin!</strong> 
-                                <span class="is-hidden-mobile">Manage students, classes, and attendance from this dashboard.</span>
+                                <strong>Welcome, Admin!</strong>
+                                <span class="is-hidden-mobile">Manage students, classes, and attendance from this
+                                    dashboard.</span>
                             </p>
                         </div>
                     </div>
@@ -154,7 +156,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
                     <a class="pagination-previous">Previous</a>
                     <a class="pagination-next">Next page</a>
@@ -194,7 +196,7 @@
             <!-- Attendance Section -->
             <div id="attendance-section" class="box mt-5" data-aos="fade-up">
                 <h3 class="title is-4 mb-3">Attendance Management</h3>
-                
+
                 <div class="field is-grouped">
                     <div class="control">
                         <div class="select">
@@ -242,7 +244,7 @@
             <!-- Student Requests Section -->
             <div id="requests-section" class="box mt-5" data-aos="fade-up">
                 <h3 class="title is-4 mb-3">Class Join Requests</h3>
-                
+
                 <div class="tabs">
                     <ul>
                         <li class="is-active"><a onclick="showPendingRequests()">Pending</a></li>
@@ -313,13 +315,15 @@
                 <div class="field">
                     <label class="label">Schedule</label>
                     <div class="control">
-                        <input class="input" type="text" id="classSchedule" placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
+                        <input class="input" type="text" id="classSchedule"
+                            placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Max Students</label>
                     <div class="control">
-                        <input class="input" type="number" id="classMaxStudents" placeholder="Maximum number of students">
+                        <input class="input" type="number" id="classMaxStudents"
+                            placeholder="Maximum number of students">
                     </div>
                 </div>
             </section>
@@ -339,16 +343,20 @@
                 </div>
                 <div class="column has-text-right">
                     <div class="buttons is-right">
-                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                            target="_blank">
                             <span class="icon"><i class="fab fa-github"></i></span>
                         </a>
-                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-tiktok"></i></span>
                         </a>
-                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-instagram"></i></span>
                         </a>
-                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL" class="button is-ghost is-small has-text-white" target="_blank">
+                        <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                            class="button is-ghost is-small has-text-white" target="_blank">
                             <span class="icon"><i class="fab fa-facebook"></i></span>
                         </a>
                     </div>
@@ -362,16 +370,15 @@
     <script>
         AOS.init();
 
-        // Navbar burger menu toggle
         document.addEventListener('DOMContentLoaded', () => {
             const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-            
+
             if ($navbarBurgers.length > 0) {
-                $navbarBurgers.forEach( el => {
+                $navbarBurgers.forEach(el => {
                     el.addEventListener('click', () => {
                         const target = el.dataset.target;
                         const $target = document.getElementById(target);
-                        
+
                         el.classList.toggle('is-active');
                         $target.classList.toggle('is-active');
                     });
@@ -380,4 +387,5 @@
         });
     </script>
 </body>
+
 </html>
