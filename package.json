@@ -1,0 +1,29 @@
+{
+  "name": "student-management-system-monorepo",
+  "version": "1.0.0",
+  "description": "Monorepo for Student Management System",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && mvn spring-boot:run",
+    "build": "npm run setup:assets && concurrently \"npm run build:frontend\" \"npm run build:backend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && mvn package",
+    "clean": "concurrently \"npm run clean:frontend\" \"npm run clean:backend\"",
+    "clean:frontend": "cd frontend && (rm -rf node_modules || rd /s /q node_modules 2>nul || echo \"No node_modules to delete\")",
+    "clean:backend": "cd backend && mvn clean",
+    "test": "concurrently \"npm run test:frontend\" \"npm run test:backend\"",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && mvn test",
+    "install:all": "npm install && npm run install:frontend",
+    "install:frontend": "cd frontend && npm install",
+    "setup:assets": "powershell -Command \"if (!(Test-Path -Path frontend/public/images)) { New-Item -ItemType Directory -Path frontend/public/images -Force }\"; powershell -Command \"Copy-Item -Path assets/images/* -Destination frontend/public/images -Force\"; powershell -Command \"if (!(Test-Path -Path frontend/dist/images)) { New-Item -ItemType Directory -Path frontend/dist/images -Force }\"; powershell -Command \"Copy-Item -Path assets/images/* -Destination frontend/dist/images -Force\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

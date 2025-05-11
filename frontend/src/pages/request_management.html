@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Requests</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="admin_dashboard.html">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <div class="navbar-item">
+                <h2 class="title is-4 has-text-white" data-aos="fade-down">Class Join Requests</h2>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main content -->
+<section class="section">
+    <div class="container" data-aos="fade-up">
+        <!-- Request filters -->
+        <div class="box">
+            <div class="columns">
+                <div class="column is-4">
+                    <div class="field">
+                        <label class="label">Filter by Status</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select id="statusFilter" onchange="filterRequests()">
+                                    <option value="all">All Requests</option>
+                                    <option value="pending" selected>Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="field">
+                        <label class="label">Filter by Class</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select id="classFilter" onchange="filterRequests()">
+                                    <option value="">All Classes</option>
+                                    <!-- Classes will be loaded dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="field">
+                        <label class="label">Search</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" id="searchInput"
+                                   placeholder="Search by student name or ID" oninput="filterRequests()">
+                            <span class="icon is-small is-left">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests table -->
+        <div class="box">
+            <div class="level mb-4">
+                <div class="level-left">
+                    <div class="level-item">
+                        <p class="subtitle is-5"><span id="requestCount">0</span> requests found</p>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons">
+                            <button class="button is-success" onclick="approveAllPending()">
+                                    <span class="icon">
+                                        <i class="fas fa-check-double"></i>
+                                    </span>
+                                <span>Approve All Pending</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                    <tr>
+                        <th>
+                            <label class="checkbox">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                            </label>
+                        </th>
+                        <th>Request ID</th>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                    <!-- Requests will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="level mt-4" id="bulkActionControls" style="display: none;">
+                <div class="level-left">
+                    <div class="level-item">
+                        <p><span id="selectedCount">0</span> requests selected</p>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="buttons">
+                            <button class="button is-success" onclick="bulkApprove()">
+                                    <span class="icon">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                <span>Approve Selected</span>
+                            </button>
+                            <button class="button is-danger" onclick="bulkReject()">
+                                    <span class="icon">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                <span>Reject Selected</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Requests Message -->
+        <div class="notification is-info is-light has-text-centered" id="noRequestsMessage" style="display:none;">
+            <p>No class join requests found matching your criteria.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Request Details Modal -->
+<div class="modal" id="requestDetailsModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Request Details</p>
+            <button class="delete" aria-label="close" onclick="closeRequestDetailsModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div id="requestDetailsContent">
+                <!-- Request details will be loaded dynamically -->
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <div id="requestActionButtons">
+                <!-- Action buttons will be loaded dynamically -->
+            </div>
+            <button class="button" onclick="closeRequestDetailsModal()">Close</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Add Feedback Modal -->
+<div class="modal" id="addFeedbackModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title" id="feedbackModalTitle">Add Feedback</p>
+            <button class="delete" aria-label="close" onclick="closeFeedbackModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">Feedback Message</label>
+                <div class="control">
+                        <textarea class="textarea" id="feedbackMessage"
+                                  placeholder="Enter feedback for the student..."></textarea>
+                </div>
+            </div>
+            <input type="hidden" id="feedbackRequestId">
+            <input type="hidden" id="feedbackAction">
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" id="submitFeedbackBtn" onclick="submitFeedback()">Submit</button>
+            <button class="button" onclick="closeFeedbackModal()">Cancel</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer has-background-grey-dark has-text-white">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <p>© 2024 Sadeepa N Herath</p>
+            </div>
+            <div class="column has-text-right">
+                <div class="buttons is-right">
+                    <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                       target="_blank">
+                        <span class="icon"><i class="fab fa-github"></i></span>
+                    </a>
+                    <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-tiktok"></i></span>
+                    </a>
+                    <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-instagram"></i></span>
+                    </a>
+                    <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-facebook"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="request_management.js"></script>
+<script>
+    AOS.init();
+</script>
+</body>
+
+</html>

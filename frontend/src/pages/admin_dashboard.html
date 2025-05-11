@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+            <strong>Admin Dashboard</strong>
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navMenu" class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item" href="#students-section">
+                Students
+            </a>
+            <a class="navbar-item" href="#classes-section">
+                Classes
+            </a>
+            <a class="navbar-item" href="#attendance-section">
+                Attendance
+            </a>
+            <a class="navbar-item" href="#requests-section">
+                Requests
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <button class="button is-light" onclick="logout()">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main content -->
+<section class="section">
+    <div class="container">
+        <!-- Admin welcome banner -->
+        <div class="notification is-primary" data-aos="fade-down">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <p>
+                            <strong>Welcome, Admin!</strong>
+                            <span class="is-hidden-mobile">Manage students, classes, and attendance from this
+                                    dashboard.</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="Search students...">
+                            </div>
+                            <div class="control">
+                                <a class="button is-info">
+                                        <span class="icon">
+                                            <i class="fas fa-search"></i>
+                                        </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="columns is-multiline" data-aos="fade-up">
+            <div class="column is-3">
+                <div class="box has-text-centered has-background-primary has-text-white">
+                    <p class="title has-text-white" id="totalStudents">0</p>
+                    <p class="heading">Total Students</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="box has-text-centered has-background-link has-text-white">
+                    <p class="title has-text-white" id="totalClasses">0</p>
+                    <p class="heading">Active Classes</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="box has-text-centered has-background-success has-text-white">
+                    <p class="title has-text-white" id="todayAttendance">0</p>
+                    <p class="heading">Today's Attendance</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="box has-text-centered has-background-warning has-text-white">
+                    <p class="title has-text-white" id="pendingRequests">0</p>
+                    <p class="heading">Pending Requests</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students-section" class="box mt-5" data-aos="fade-up">
+            <div class="level mb-3">
+                <div class="level-left">
+                    <div class="level-item">
+                        <h3 class="title is-4">Student Management</h3>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a href="add_student.html" class="button is-primary">
+                                <span class="icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </span>
+                            <span>Add Student</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Classes</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                    <!-- Students will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <nav class="pagination is-centered mt-4" role="navigation" aria-label="pagination">
+                <a class="pagination-previous">Previous</a>
+                <a class="pagination-next">Next page</a>
+                <ul class="pagination-list">
+                    <li><a class="pagination-link is-current" aria-label="Page 1" aria-current="page">1</a></li>
+                    <li><a class="pagination-link" aria-label="Goto page 2">2</a></li>
+                    <li><a class="pagination-link" aria-label="Goto page 3">3</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Classes Section -->
+        <div id="classes-section" class="box mt-5" data-aos="fade-up">
+            <div class="level mb-3">
+                <div class="level-left">
+                    <div class="level-item">
+                        <h3 class="title is-4">Class Management</h3>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <button class="button is-primary" onclick="showAddClassModal()">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                            <span>Add Class</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns is-multiline" id="classesContainer">
+                <!-- Classes will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="attendance-section" class="box mt-5" data-aos="fade-up">
+            <h3 class="title is-4 mb-3">Attendance Management</h3>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <div class="select">
+                        <select id="classSelect">
+                            <option value="">Select Class</option>
+                            <!-- Class options will be loaded dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <input class="input" type="date" id="attendanceDate" value="">
+                </div>
+                <div class="control">
+                    <button class="button is-info" onclick="loadAttendanceSheet()">
+                        Load
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container mt-4" id="attendanceContainer" style="display: none;">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Mark As</th>
+                    </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                    <!-- Attendance data will be loaded dynamically -->
+                    </tbody>
+                </table>
+
+                <div class="field mt-4">
+                    <div class="control">
+                        <button class="button is-success" onclick="saveAttendance()">
+                            Save Attendance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Requests Section -->
+        <div id="requests-section" class="box mt-5" data-aos="fade-up">
+            <h3 class="title is-4 mb-3">Class Join Requests</h3>
+
+            <div class="tabs">
+                <ul>
+                    <li class="is-active"><a onclick="showPendingRequests()">Pending</a></li>
+                    <li><a onclick="showApprovedRequests()">Approved</a></li>
+                    <li><a onclick="showRejectedRequests()">Rejected</a></li>
+                </ul>
+            </div>
+
+            <div class="table-container" id="requestsTableContainer">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                    <!-- Requests will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Class Modal -->
+<div class="modal" id="addClassModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Add New Class</p>
+            <button class="delete" aria-label="close" onclick="closeAddClassModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">Class Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="className" placeholder="Enter class name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Description</label>
+                <div class="control">
+                    <textarea class="textarea" id="classDescription" placeholder="Class description"></textarea>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Start Date</label>
+                        <div class="control">
+                            <input class="input" type="date" id="classStartDate">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">End Date</label>
+                        <div class="control">
+                            <input class="input" type="date" id="classEndDate">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Schedule</label>
+                <div class="control">
+                    <input class="input" type="text" id="classSchedule"
+                           placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Max Students</label>
+                <div class="control">
+                    <input class="input" type="number" id="classMaxStudents"
+                           placeholder="Maximum number of students">
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" onclick="addClass()">Add Class</button>
+            <button class="button" onclick="closeAddClassModal()">Cancel</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer has-background-grey-dark has-text-white">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <p>© 2024 Sadeepa N Herath</p>
+            </div>
+            <div class="column has-text-right">
+                <div class="buttons is-right">
+                    <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                       target="_blank">
+                        <span class="icon"><i class="fab fa-github"></i></span>
+                    </a>
+                    <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-tiktok"></i></span>
+                    </a>
+                    <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-instagram"></i></span>
+                    </a>
+                    <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-facebook"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="admin_dashboard.js"></script>
+<script>
+    AOS.init();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        if ($navbarBurgers.length > 0) {
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+                });
+            });
+        }
+    });
+</script>
+</body>
+
+</html>

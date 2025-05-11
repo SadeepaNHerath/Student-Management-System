@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Management</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<!-- Navigation -->
+<nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="admin_dashboard.html">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <div class="navbar-item">
+                <h2 class="title is-4 has-text-white" data-aos="fade-down">Class Management</h2>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main content -->
+<section class="section">
+    <div class="container" data-aos="fade-up">
+        <!-- Class management tools -->
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <button class="button is-primary" onclick="showAddClassModal()">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                            <span>Add New Class</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="Search classes..."
+                                       id="classSearchInput">
+                            </div>
+                            <div class="control">
+                                <button class="button is-info" onclick="searchClasses()">
+                                        <span class="icon">
+                                            <i class="fas fa-search"></i>
+                                        </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classes list tabs -->
+        <div class="tabs" data-aos="fade-up">
+            <ul>
+                <li class="is-active"><a onclick="filterClasses('all')">All Classes</a></li>
+                <li><a onclick="filterClasses('active')">Active</a></li>
+                <li><a onclick="filterClasses('upcoming')">Upcoming</a></li>
+                <li><a onclick="filterClasses('completed')">Completed</a></li>
+            </ul>
+        </div>
+
+        <!-- Classes list -->
+        <div class="columns is-multiline" id="classesContainer" data-aos="fade-up">
+            <!-- Classes will be loaded dynamically -->
+        </div>
+    </div>
+</section>
+
+<!-- Class Details Modal -->
+<div class="modal" id="classDetailsModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title" id="modalClassTitle">Class Details</p>
+            <button class="delete" aria-label="close" onclick="closeClassDetailsModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div id="classDetailsContent">
+                <!-- Class details will be loaded dynamically -->
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-primary" onclick="showEditClassModal()">Edit Class</button>
+            <button class="button is-danger" onclick="confirmDeleteClass()">Delete Class</button>
+            <button class="button" onclick="closeClassDetailsModal()">Close</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Add/Edit Class Modal -->
+<div class="modal" id="addEditClassModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title" id="addEditClassTitle">Add New Class</p>
+            <button class="delete" aria-label="close" onclick="closeAddEditClassModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="field">
+                <label class="label">Class Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="className" placeholder="Enter class name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Description</label>
+                <div class="control">
+                    <textarea class="textarea" id="classDescription" placeholder="Class description"></textarea>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Start Date</label>
+                        <div class="control">
+                            <input class="input" type="date" id="classStartDate">
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">End Date</label>
+                        <div class="control">
+                            <input class="input" type="date" id="classEndDate">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Schedule</label>
+                <div class="control">
+                    <input class="input" type="text" id="classSchedule"
+                           placeholder="E.g., Mon, Wed, Fri 10:00-12:00">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Max Students</label>
+                <div class="control">
+                    <input class="input" type="number" id="classMaxStudents"
+                           placeholder="Maximum number of students">
+                </div>
+            </div>
+            <input type="hidden" id="classId">
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" id="saveClassBtn" onclick="saveClass()">Save Class</button>
+            <button class="button" onclick="closeAddEditClassModal()">Cancel</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Manage Students in Class Modal -->
+<div class="modal" id="manageStudentsModal">
+    <div class="modal-background"></div>
+    <div class="modal-card is-large">
+        <header class="modal-card-head">
+            <p class="modal-card-title" id="manageStudentsTitle">Manage Students</p>
+            <button class="delete" aria-label="close" onclick="closeManageStudentsModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="tabs">
+                <ul>
+                    <li class="is-active"><a data-tab="enrolled-students">Enrolled Students</a></li>
+                    <li><a data-tab="add-students">Add Students</a></li>
+                </ul>
+            </div>
+
+            <div id="enrolled-students-tab">
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Attendance</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="enrolledStudentsTableBody">
+                        <!-- Enrolled students will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="add-students-tab" style="display: none;">
+                <div class="field has-addons mb-4">
+                    <div class="control is-expanded">
+                        <input class="input" type="text" placeholder="Search students by name or ID..."
+                               id="studentSearchInput">
+                    </div>
+                    <div class="control">
+                        <button class="button is-info" onclick="searchStudentsToAdd()">
+                                <span class="icon">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="availableStudentsTableBody">
+                        <!-- Available students will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button" onclick="closeManageStudentsModal()">Close</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer has-background-grey-dark has-text-white">
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <p>© 2024 Sadeepa N Herath</p>
+            </div>
+            <div class="column has-text-right">
+                <div class="buttons is-right">
+                    <a href="https://github.com/SadeepaNHerath" class="button is-ghost is-small has-text-white"
+                       target="_blank">
+                        <span class="icon"><i class="fab fa-github"></i></span>
+                    </a>
+                    <a href="https://www.tiktok.com/@sadeepanherath?_t=8p3J8dyFl5k&_r=1"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-tiktok"></i></span>
+                    </a>
+                    <a href="https://www.instagram.com/sadeepa_herath_18?igsh=NHg2emxpeHpnZnJu"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-instagram"></i></span>
+                    </a>
+                    <a href="https://www.facebook.com/SadeepaNHerath?mibextid=ZbWKwL"
+                       class="button is-ghost is-small has-text-white" target="_blank">
+                        <span class="icon"><i class="fab fa-facebook"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="class_management.js"></script>
+<script>
+    AOS.init();
+
+    // Tab switching
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.tabs li');
+        const tabContents = document.querySelectorAll('[id$="-tab"]');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(item => item.classList.remove('is-active'));
+                tab.classList.add('is-active');
+
+                const target = tab.querySelector('a').getAttribute('data-tab');
+
+                tabContents.forEach(content => {
+                    if (content.id === target + '-tab') {
+                        content.style.display = 'block';
+                    } else {
+                        content.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+</body>
+
+</html>

@@ -1,6 +1,12 @@
-# Student Management System
+# Student Management System - Monorepo
 
-A comprehensive student management system with both front-end and back-end components, built to streamline academic administration.
+A comprehensive student management system with both front-end and back-end components, built to streamline academic administration. This repository uses a monorepo structure to organize frontend and backend code in an efficient way.
+
+## Project Structure
+
+- `frontend/`: HTML, CSS, and JavaScript frontend
+- `backend/`: Java Spring Boot backend
+- `assets/`: Shared assets (images, etc.)
 
 ## Project Overview
 
@@ -36,14 +42,43 @@ The Student Management System provides an integrated platform for educational in
 
 ## Project Structure
 
+```
+student-management-system/
+├── assets/              # Shared assets used by both frontend and backend
+│   └── images/          # Shared images
+├── frontend/            # Frontend code
+│   ├── package.json     # Frontend dependencies and scripts
+│   ├── src/             # Source files
+│   │   ├── app.js       # Main application entry point
+│   │   ├── style.css    # Global styles
+│   │   ├── components/  # Reusable UI components
+│   │   ├── pages/       # Page components (HTML and corresponding JS)
+│   │   ├── services/    # API services for backend communication
+│   │   └── utils/       # Utility functions and constants
+│   └── public/          # Static assets served by the frontend
+├── backend/             # Spring Boot backend
+│   ├── pom.xml          # Maven configuration
+│   └── src/             # Source files
+│       ├── main/        # Main source code
+│       │   ├── java/    # Java source files
+│       │   │   └── edu/icet/  # Main package
+│       │   │       ├── controller/ # REST controllers
+│       │   │       ├── service/    # Business logic services
+│       │   │       ├── repository/ # Data access repositories
+│       │   │       └── dto/        # Data transfer objects
+│       │   └── resources/  # Configuration and static resources
+│       └── test/       # Test code
+└── package.json        # Root package.json for monorepo management
+```
+
 ### Front-end Components
-- `index.html` & `app.js` - Main entry point with authentication detection
-- `login.html` & `login.js` - Authentication for students and administrators
-- `admin_dashboard.html` & `admin_dashboard.js` - Admin control panel
-- `student_dashboard.html` & `student_dashboard.js` - Student portal
-- `class_management.html` & `class_management.js` - Class creation and management
-- `attendance_management.html` & `attendance_management.js` - Attendance tracking
-- `request_management.html` & `request_management.js` - Class enrollment requests
+- `frontend/src/index.html` & `frontend/src/app.js` - Main entry point with authentication detection
+- `frontend/src/login.html` & `frontend/src/login.js` - Authentication for students and administrators
+- `frontend/src/admin_dashboard.html` & `frontend/src/admin_dashboard.js` - Admin control panel
+- `frontend/src/student_dashboard.html` & `frontend/src/student_dashboard.js` - Student portal
+- `frontend/src/class_management.html` & `frontend/src/class_management.js` - Class creation and management
+- `frontend/src/attendance_management.html` & `frontend/src/attendance_management.js` - Attendance tracking
+- `frontend/src/request_management.html` & `frontend/src/request_management.js` - Class enrollment requests
 
 ### Back-end Components
 - Java Spring Boot application with MVC architecture
@@ -63,32 +98,40 @@ The Student Management System provides an integrated platform for educational in
 1. Clone the repository
 ```bash
 git clone https://github.com/your-username/Student-Management-System.git
+cd Student-Management-System
 ```
 
-2. Configure database connection in `src/main/resources/application.yml`
+2. Install root and frontend dependencies:
+```bash
+npm run install:all
+```
+
+3. Configure database connection in `backend/src/main/resources/application.yml`
 ```yaml
 spring:
-  dataSource:
+  datasource:
     url: jdbc:mysql://localhost:3306/student?createDatabaseIfNotExist=true
     username: your_username
     password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 ```
 
-3. Build the Spring Boot application
+4. Build the project (both frontend and backend)
 ```bash
-cd Student-Management-System
-mvn clean install
+npm run build
 ```
 
-4. Run the application
+5. Run both frontend and backend
 ```bash
-java -jar target/Student-Management-System-1.0-SNAPSHOT.jar
+npm start
 ```
 
-5. Access the application in your web browser
-```
-http://localhost:8080
-```
+6. Access the application in your web browser
+   - Frontend: http://localhost:8081
+   - Backend API: http://localhost:8080/api
 
 ## Default Login Credentials
 

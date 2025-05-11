@@ -1,0 +1,19 @@
+{
+  "name": "student-management-system-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Student Management System",
+  "scripts": {
+    "start": "http-server . -a localhost -p 8081 -c-1",
+    "build": "powershell -Command \"if (!(Test-Path -Path dist)) { New-Item -ItemType Directory -Path dist }; Copy-Item -Path src\\*.css -Destination dist\\; Copy-Item -Path src\\*.js -Destination dist\\; Copy-Item -Path src\\pages\\*.html -Destination dist\\; Copy-Item -Path src\\pages\\*.js -Destination dist\\; Copy-Item -Path src\\components\\* -Destination dist\\components\\ -Recurse -Force; Copy-Item -Path src\\services\\* -Destination dist\\services\\ -Recurse -Force; Copy-Item -Path src\\utils\\* -Destination dist\\utils\\ -Recurse -Force; Copy-Item -Path public\\* -Destination dist\\ -Recurse -Force\"",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting configured\" && exit 0",
+    "clean": "powershell -Command \"if (Test-Path -Path dist) { Remove-Item -Path dist -Recurse -Force }\""
+  },
+  "dependencies": {
+    "aos": "^2.3.4",
+    "bulma": "^0.9.4"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

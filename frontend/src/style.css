@@ -1,0 +1,146 @@
+/* Hero background and overlay */
+.hero.is-primary {
+    background: linear-gradient(135deg, #00d1b2, #3273dc);
+}
+
+.navbar.is-primary {
+    background: linear-gradient(135deg, #00d1b2, #3273dc);
+}
+
+.has-background-dark-transparent {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .icon.is-large {
+    height: 5rem;
+    width: 5rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-card .icon.is-large i {
+    font-size: 3rem;
+}
+
+/* Admin dashboard specific styles */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+/* Profile styles */
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #00d1b2;
+    margin: 0 auto;
+    display: block;
+}
+
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Profile picture upload component */
+.file-upload {
+    position: relative;
+    display: inline-block;
+    margin: 1rem auto;
+}
+
+.file-upload-container {
+    position: relative;
+    width: 165px;
+    height: 165px;
+    margin: 0 auto;
+}
+
+.file-upload img {
+    object-fit: cover;
+    width: 165px;
+    height: 165px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.file-upload-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.file-upload-label:hover {
+    opacity: 1;
+}
+
+.file-upload-label .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+/* Table customizations */
+.student-table {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.student-table img {
+    border-radius: 50%;
+}
+
+.profile-pic:hover .-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    color: #fafafa;
+    transition: background-color 0.2s ease-in-out;
+    border-radius: 100px;
+    margin-bottom: 0;
+}
+
+.profile-pic span {
+    display: inline-flex;
+    padding: 0.2em;
+    height: 2em;
+}
