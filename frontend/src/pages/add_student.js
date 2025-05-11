@@ -1,4 +1,6 @@
-import {getDefaultProfilePic} from './utils/helpers.js';
+import {getDefaultProfilePic} from '../utils/helpers.js';
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
 
 const profilePhoto = document.getElementById('profilePhoto');
 const fileInput = document.getElementById('fileInput');
@@ -26,7 +28,7 @@ async function addStudent() {
         formData.append('profilePic', fileInput.files[0]);
 
         try {
-            const response = await fetch('http://localhost:8080/api/students', {
+            const response = await fetch(`${API_BASE_URL}/student/students`, {
                 method: 'POST',
                 body: formData,
                 redirect: 'follow'

@@ -1,3 +1,6 @@
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
+
 const profilePhoto = document.getElementById('profilePhoto');
 const searchInput = document.getElementById('searchId');
 const searchButton = document.getElementById('searchBtn');
@@ -12,56 +15,51 @@ let nextIndex;
 let prevIndex;
 
 async function fetchStudents() {
-    fetch('http://localhost:8080/student/students', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
+    try {
+        studentsArray = await ApiService.getStudents();
+        
+        if (!studentsArray) {
+            throw new Error('Failed to fetch students');
         }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch students');
-            }
-            return response.json();
-        })
-        .then(data => {
-            studentsArray = data;
-            loadStudents();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        
+        loadStudents();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load students data. Please try again later.');
+    }
 }
 
-function loadProfile() {
-    studentId = searchInput.value;
-    fetch(`http://localhost:8080/student/students/${studentId}`)
-        .then(response => response.json())
-        .then(student => {
-            if (student) {
-                document.getElementById('profilePhotoCard').src = `data:image/jpeg;base64,${student.profilePic}`;
+async function loadProfile() {
+    try {
+        studentId = searchInput.value;
+        const student = await ApiService.getStudent(studentId);
+        
+        if (student) {
+            document.getElementById('profilePhotoCard').src = `data:image/jpeg;base64,${student.profilePic}`;
 
-                document.getElementById('stuName').textContent = `${student.fName} ${student.lName}`;
-                document.getElementById('stuId').textContent = student.id;
-                document.getElementById('stuAddress').textContent = student.address;
-                document.getElementById('stuNic').textContent = student.nic;
-                document.getElementById('stuContact').textContent = student.contact;
+            document.getElementById('stuName').textContent = `${student.fName} ${student.lName}`;
+            document.getElementById('stuId').textContent = student.id;
+            document.getElementById('stuAddress').textContent = student.address;
+            document.getElementById('stuNic').textContent = student.nic;
+            document.getElementById('stuContact').textContent = student.contact;
 
-                // document.getElementById('prevBtn').href = `/previous/${student.id}`;
-                // document.getElementById('nextBtn').href = `/next/${student.id}`;
+            // document.getElementById('prevBtn').href = `/previous/${student.id}`;
+            // document.getElementById('nextBtn').href = `/next/${student.id}`;
 
-                document.getElementById('editBtn').addEventListener('click', () => {
-                    editStudent(student.id);
-                });
-                document.getElementById('deleteBtn').addEventListener('click', () => {
-                    deleteStudent(student.id);
-                });
-                document.getElementById('profileCard').style.display = "block";
-            } else {
-                console.error('Student not found');
-            }
-        })
-        .catch(error => console.error('Error fetching student data:', error));
+            document.getElementById('editBtn').addEventListener('click', () => {
+                editStudent(student.id);
+            });
+            document.getElementById('deleteBtn').addEventListener('click', () => {
+                deleteStudent(student.id);
+            });
+            document.getElementById('profileCard').style.display = "block";
+        } else {
+            console.error('Student not found');
+        }
+    } catch (error) {
+        console.error('Error fetching student data:', error);
+    }
+    
     searchInput.value = '';
 }
 
@@ -127,33 +125,22 @@ searchInput.addEventListener('keydown', function (event) {
     }
 })
 
-function deleteStudent(id) {
+async function deleteStudent(id) {
     const confirmed = confirm("Are you sure you want to delete this student?");
 
     if (!confirmed) {
         return;
     }
 
-    const requestOptions = {
-        method: "DELETE",
-        redirect: "follow"
-    };
-
-    fetch(`http://localhost:8080/student/students/${id}`, requestOptions)
-        .then((response) => {
-            if (response.ok) {
-                alert("Student deleted successfully");
-                loadStudents();
-            } else {
-                return response.text().then((text) => {
-                    throw new Error(`Failed to delete student: ${text}`);
-                });
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Error: Unable to delete student.');
-        });
+    try {
+        await ApiService.deleteStudent(id);
+        alert("Student deleted successfully");
+        await fetchStudents(); // Refresh the student list
+        document.getElementById('profileCard').style.display = "none"; // Hide the profile card
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: Unable to delete student.');
+    }
 }
 
 function editStudent() {

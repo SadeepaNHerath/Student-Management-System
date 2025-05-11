@@ -7,6 +7,9 @@
  * - Processing student requests for classes
  */
 
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
+
 let students = [];
 let classes = [];
 let requests = [];
@@ -115,12 +118,11 @@ function showSuccess(message) {
 async function loadStudents() {
     try {
         showLoading('studentsTableContainer', 'Loading students data...');
-        const response = await fetch(`${API_BASE_URL}/student/students`);
-        if (!response.ok) {
+        students = await ApiService.getStudents();
+        
+        if (!students) {
             throw new Error('Failed to load students');
         }
-
-        students = await response.json();
 
         updateStudentsTable();
 
@@ -132,7 +134,6 @@ async function loadStudents() {
     }
 }
 
-// Update the students table with current data
 function updateStudentsTable() {
     const tableBody = document.getElementById('studentsTableBody');
     if (!tableBody) return;
@@ -180,10 +181,8 @@ function updateStudentsTable() {
     });
 }
 
-// View student details
 async function viewStudentDetails(studentId) {
     try {
-        // Fetch student details from API
         const response = await fetch(`${API_BASE_URL}/student/students/${studentId}`);
         if (!response.ok) {
             throw new Error('Failed to load student details');
@@ -191,7 +190,6 @@ async function viewStudentDetails(studentId) {
 
         const student = await response.json();
 
-        // Fetch student's classes
         const classesResponse = await fetch(`${API_BASE_URL}/classes/student/${studentId}`);
         let studentClasses = [];
 
@@ -199,8 +197,7 @@ async function viewStudentDetails(studentId) {
             studentClasses = await classesResponse.json();
         }
 
-        // Convert the binary profile picture to a data URL if available
-        let profilePicUrl = '../../public/profile-pic.png'; // Default
+        let profilePicUrl = '../../public/profile-pic.png';
         if (student.profilePic) {
             try {
                 const blob = new Blob([new Uint8Array(student.profilePic)], {type: 'image/png'});
@@ -210,7 +207,6 @@ async function viewStudentDetails(studentId) {
             }
         }
 
-        // Create modal HTML
         const modalHTML = `
             <div class="modal is-active" id="studentDetailsModal">
                 <div class="modal-background"></div>
@@ -270,7 +266,6 @@ async function viewStudentDetails(studentId) {
             </div>
         `;
 
-        // Add modal to body
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     } catch (error) {
         console.error('Error viewing student details:', error);
@@ -278,7 +273,6 @@ async function viewStudentDetails(studentId) {
     }
 }
 
-// Close any modal by ID
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -286,10 +280,8 @@ function closeModal(modalId) {
     }
 }
 
-// Edit student details
 async function editStudent(studentId) {
     try {
-        // Fetch student details from API
         const response = await fetch(`${API_BASE_URL}/student/students/${studentId}`);
         if (!response.ok) {
             throw new Error('Failed to load student details');
@@ -297,7 +289,6 @@ async function editStudent(studentId) {
 
         const student = await response.json();
 
-        // Convert the binary profile picture to a data URL if available
         let profilePicUrl = '../../public/profile-pic.png'; // Default
         if (student.profilePic) {
             try {
@@ -308,7 +299,6 @@ async function editStudent(studentId) {
             }
         }
 
-        // Create modal HTML
         const modalHTML = `
             <div class="modal is-active" id="editStudentModal">
                 <div class="modal-background"></div>
@@ -388,10 +378,8 @@ async function editStudent(studentId) {
             </div>
         `;
 
-        // Add modal to body
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Add file input event listener
         document.getElementById('studentProfilePic').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -409,7 +397,6 @@ async function editStudent(studentId) {
     }
 }
 
-// Save student changes
 async function saveStudentChanges(studentId) {
     // Show loading state
     const saveButton = document.querySelector('#editStudentModal .button.is-success');
@@ -418,7 +405,6 @@ async function saveStudentChanges(studentId) {
     saveButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Saving...</span>';
 
     try {
-        // Get form values
         const firstName = document.getElementById('editFirstName').value;
         const lastName = document.getElementById('editLastName').value;
         const nic = document.getElementById('editNic').value;
@@ -427,10 +413,8 @@ async function saveStudentChanges(studentId) {
         const dob = document.getElementById('editDob').value;
         const profilePicInput = document.getElementById('studentProfilePic');
 
-        // Create FormData object for multipart/form-data request
         const formData = new FormData();
 
-        // Create student object
         const updatedStudent = {
             id: studentId,
             fName: firstName,
@@ -441,22 +425,18 @@ async function saveStudentChanges(studentId) {
             dob: dob
         };
 
-        // Add JSON data as a blob
         const studentBlob = new Blob([JSON.stringify(updatedStudent)], {
             type: 'application/json'
         });
         formData.append('student', studentBlob);
 
-        // Add profile picture if selected
         if (profilePicInput.files.length > 0) {
             formData.append('profilePicture', profilePicInput.files[0]);
         } else {
-            // Create an empty file to satisfy the API
             const emptyBlob = new Blob([''], {type: 'application/octet-stream'});
             formData.append('profilePicture', emptyBlob, 'empty.txt');
         }
 
-        // Send update request
         const response = await fetch(`${API_BASE_URL}/student/students`, {
             method: 'PATCH',
             body: formData
@@ -466,35 +446,28 @@ async function saveStudentChanges(studentId) {
             throw new Error('Failed to update student');
         }
 
-        // Refresh students list
         await loadStudents();
 
-        // Close modal
         closeModal('editStudentModal');
 
-        // Show success message
         showSuccess('Student updated successfully!');
     } catch (error) {
         console.error('Error updating student:', error);
         showError('Failed to update student details');
 
-        // Restore button state
         saveButton.disabled = false;
         saveButton.textContent = originalText;
     }
 }
 
-// Delete student
 function deleteStudent(studentId) {
     if (confirm('Are you sure you want to delete this student? This action cannot be undone.')) {
         deleteStudentFromAPI(studentId);
     }
 }
 
-// Delete student from API
 async function deleteStudentFromAPI(studentId) {
     try {
-        // Send delete request
         const response = await fetch(`${API_BASE_URL}/student/students/${studentId}`, {
             method: 'DELETE'
         });
@@ -503,10 +476,8 @@ async function deleteStudentFromAPI(studentId) {
             throw new Error('Failed to delete student');
         }
 
-        // Refresh students list
         await loadStudents();
 
-        // Show success message
         showSuccess('Student deleted successfully!');
     } catch (error) {
         console.error('Error deleting student:', error);
@@ -514,9 +485,7 @@ async function deleteStudentFromAPI(studentId) {
     }
 }
 
-// Show form to add a new student
 function showAddStudentForm() {
-    // Create modal HTML
     const modalHTML = `
         <div class="modal is-active" id="addStudentModal">
             <div class="modal-background"></div>
@@ -596,10 +565,8 @@ function showAddStudentForm() {
         </div>
     `;
 
-    // Add modal to body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // Add file input event listener
     document.getElementById('newStudentProfilePic').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
@@ -613,16 +580,13 @@ function showAddStudentForm() {
     });
 }
 
-// Add a new student
 async function addStudent() {
-    // Show loading state
     const addButton = document.querySelector('#addStudentModal .button.is-success');
     const originalText = addButton.textContent;
     addButton.disabled = true;
     addButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Adding...</span>';
 
     try {
-        // Get form values
         const firstName = document.getElementById('newFirstName').value;
         const lastName = document.getElementById('newLastName').value;
         const nic = document.getElementById('newNic').value;
@@ -631,15 +595,12 @@ async function addStudent() {
         const dob = document.getElementById('newDob').value;
         const profilePicInput = document.getElementById('newStudentProfilePic');
 
-        // Validation
         if (!firstName || !lastName) {
             throw new Error('First name and last name are required');
         }
 
-        // Create FormData object for multipart/form-data request
         const formData = new FormData();
 
-        // Create student object
         const newStudent = {
             fName: firstName,
             lName: lastName,
@@ -649,22 +610,18 @@ async function addStudent() {
             dob: dob
         };
 
-        // Add JSON data as a blob
         const studentBlob = new Blob([JSON.stringify(newStudent)], {
             type: 'application/json'
         });
         formData.append('student', studentBlob);
 
-        // Add profile picture if selected
         if (profilePicInput.files.length > 0) {
             formData.append('profilePicture', profilePicInput.files[0]);
         } else {
-            // Create an empty file to satisfy the API
             const emptyBlob = new Blob([''], {type: 'application/octet-stream'});
             formData.append('profilePicture', emptyBlob, 'empty.txt');
         }
 
-        // Send create request
         const response = await fetch(`${API_BASE_URL}/student/students`, {
             method: 'POST',
             body: formData
@@ -674,19 +631,15 @@ async function addStudent() {
             throw new Error('Failed to add student');
         }
 
-        // Refresh students list
         await loadStudents();
 
-        // Close modal
         closeModal('addStudentModal');
 
-        // Show success message
         showSuccess('Student added successfully!');
     } catch (error) {
         console.error('Error adding student:', error);
         showError(error.message || 'Failed to add student');
 
-        // Restore button state
         addButton.disabled = false;
         addButton.textContent = originalText;
     }
@@ -694,20 +647,16 @@ async function addStudent() {
 
 // ============= CLASSES MANAGEMENT =============
 
-// Load classes from API
 async function loadClasses() {
     try {
         showLoading('classesTableContainer', 'Loading classes data...');
 
-        // Fetch classes from API
-        const response = await fetch(`${API_BASE_URL}/classes`);
-        if (!response.ok) {
+        classes = await ApiService.getClasses();
+        
+        if (!classes) {
             throw new Error('Failed to load classes');
         }
 
-        classes = await response.json();
-
-        // Update the UI
         updateClassesTable();
 
         hideLoading('classesTableContainer');
@@ -718,7 +667,6 @@ async function loadClasses() {
     }
 }
 
-// Update the classes table with current data
 function updateClassesTable() {
     const tableBody = document.getElementById('classesTableBody');
     if (!tableBody) return;
@@ -768,7 +716,6 @@ function updateClassesTable() {
     });
 }
 
-// Add event listener for add class button if it exists
 document.addEventListener('DOMContentLoaded', function () {
     const addClassBtn = document.getElementById('addClassBtn');
     if (addClassBtn) {
@@ -776,16 +723,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Add a new class
 async function addClass() {
-    // Show loading state
     const addButton = document.querySelector('#addClassModal .button.is-success');
     const originalText = addButton.textContent;
     addButton.disabled = true;
     addButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Adding...</span>';
 
     try {
-        // Get form values
         const className = document.getElementById('newClassName').value;
         const description = document.getElementById('newClassDescription').value;
         const schedule = document.getElementById('newClassSchedule').value;
@@ -793,7 +737,6 @@ async function addClass() {
         const endDate = document.getElementById('newClassEndDate').value;
         const maxStudents = document.getElementById('newClassMaxStudents').value;
 
-        // Validation
         if (!className) {
             throw new Error('Class name is required');
         }
@@ -806,7 +749,6 @@ async function addClass() {
             throw new Error('End date must be after start date');
         }
 
-        // Create class object
         const newClass = {
             name: className,
             description: description,
@@ -816,7 +758,6 @@ async function addClass() {
             maxStudents: maxStudents ? parseInt(maxStudents) : null
         };
 
-        // Send create request
         const response = await fetch(`${API_BASE_URL}/classes`, {
             method: 'POST',
             headers: {
@@ -829,27 +770,21 @@ async function addClass() {
             throw new Error('Failed to add class');
         }
 
-        // Refresh classes list
         await loadClasses();
 
-        // Close modal
         closeModal('addClassModal');
 
-        // Show success message
         showSuccess('Class added successfully!');
     } catch (error) {
         console.error('Error adding class:', error);
         showError(error.message || 'Failed to add class');
 
-        // Restore button state
         addButton.disabled = false;
         addButton.textContent = originalText;
     }
 }
 
-// Show form to add a new class
 function showAddClassForm() {
-    // Create modal HTML
     const modalHTML = `
         <div class="modal is-active" id="addClassModal">
             <div class="modal-background"></div>
@@ -910,18 +845,14 @@ function showAddClassForm() {
         </div>
     `;
 
-    // Add modal to body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// View class details
 async function viewClassDetails(classId) {
     try {
-        // Find the class
         const classObj = classes.find(c => c.id == classId);
         if (!classObj) return;
 
-        // Fetch students enrolled in this class
         const response = await fetch(`${API_BASE_URL}/classes/${classId}/students`);
         let enrolledStudents = [];
 
@@ -929,7 +860,6 @@ async function viewClassDetails(classId) {
             enrolledStudents = await response.json();
         }
 
-        // Create modal HTML
         const modalHTML = `
             <div class="modal is-active" id="classDetailsModal">
                 <div class="modal-background"></div>
@@ -979,7 +909,6 @@ async function viewClassDetails(classId) {
             </div>
         `;
 
-        // Add modal to body
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     } catch (error) {
         console.error('Error viewing class details:', error);
@@ -987,14 +916,11 @@ async function viewClassDetails(classId) {
     }
 }
 
-// Edit class
 async function editClass(classId) {
     try {
-        // Find the class
         const classObj = classes.find(c => c.id == classId);
         if (!classObj) return;
 
-        // Create modal HTML
         const modalHTML = `
             <div class="modal is-active" id="editClassModal">
                 <div class="modal-background"></div>
@@ -1055,7 +981,6 @@ async function editClass(classId) {
             </div>
         `;
 
-        // Add modal to body
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     } catch (error) {
         console.error('Error editing class:', error);
@@ -1063,16 +988,13 @@ async function editClass(classId) {
     }
 }
 
-// Save class changes
 async function saveClassChanges(classId) {
-    // Show loading state
     const saveButton = document.querySelector('#editClassModal .button.is-success');
     const originalText = saveButton.textContent;
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Saving...</span>';
 
     try {
-        // Get form values
         const className = document.getElementById('editClassName').value;
         const description = document.getElementById('editClassDescription').value;
         const schedule = document.getElementById('editClassSchedule').value;
@@ -1080,7 +1002,6 @@ async function saveClassChanges(classId) {
         const endDate = document.getElementById('editClassEndDate').value;
         const maxStudents = document.getElementById('editClassMaxStudents').value;
 
-        // Validation
         if (!className) {
             throw new Error('Class name is required');
         }
@@ -1093,7 +1014,6 @@ async function saveClassChanges(classId) {
             throw new Error('End date must be after start date');
         }
 
-        // Create class object
         const updatedClass = {
             id: classId,
             name: className,
@@ -1104,7 +1024,6 @@ async function saveClassChanges(classId) {
             maxStudents: maxStudents ? parseInt(maxStudents) : null
         };
 
-        // Send update request
         const response = await fetch(`${API_BASE_URL}/classes/${classId}`, {
             method: 'PUT',
             headers: {
@@ -1117,35 +1036,28 @@ async function saveClassChanges(classId) {
             throw new Error('Failed to update class');
         }
 
-        // Refresh classes list
         await loadClasses();
 
-        // Close modal
         closeModal('editClassModal');
 
-        // Show success message
         showSuccess('Class updated successfully!');
     } catch (error) {
         console.error('Error updating class:', error);
         showError(error.message || 'Failed to update class');
 
-        // Restore button state
         saveButton.disabled = false;
         saveButton.textContent = originalText;
     }
 }
 
-// Delete class
 function deleteClass(classId) {
     if (confirm('Are you sure you want to delete this class? This action cannot be undone.')) {
         deleteClassFromAPI(classId);
     }
 }
 
-// Delete class from API
 async function deleteClassFromAPI(classId) {
     try {
-        // Send delete request
         const response = await fetch(`${API_BASE_URL}/classes/${classId}`, {
             method: 'DELETE'
         });
@@ -1154,10 +1066,8 @@ async function deleteClassFromAPI(classId) {
             throw new Error('Failed to delete class');
         }
 
-        // Refresh classes list
         await loadClasses();
 
-        // Show success message
         showSuccess('Class deleted successfully!');
     } catch (error) {
         console.error('Error deleting class:', error);
@@ -1167,20 +1077,16 @@ async function deleteClassFromAPI(classId) {
 
 // ============= REQUESTS MANAGEMENT =============
 
-// Load class requests from API
 async function loadRequests() {
     try {
         showLoading('requestsTableContainer', 'Loading requests data...');
 
-        // Fetch requests from API
-        const response = await fetch(`${API_BASE_URL}/requests`);
-        if (!response.ok) {
+        requests = await ApiService.getRequests();
+        
+        if (!requests) {
             throw new Error('Failed to load requests');
         }
 
-        requests = await response.json();
-
-        // Update the UI
         updateRequestsTable();
 
         hideLoading('requestsTableContainer');
@@ -1191,7 +1097,6 @@ async function loadRequests() {
     }
 }
 
-// Update the requests table with current data
 function updateRequestsTable() {
     const tableBody = document.getElementById('requestsTableBody');
     if (!tableBody) return;
@@ -1245,10 +1150,8 @@ function updateRequestsTable() {
     });
 }
 
-// Approve class request
 async function approveRequest(requestId) {
     try {
-        // Send approval request
         const response = await fetch(`${API_BASE_URL}/requests/${requestId}/approve`, {
             method: 'PUT'
         });
@@ -1257,10 +1160,8 @@ async function approveRequest(requestId) {
             throw new Error('Failed to approve request');
         }
 
-        // Refresh requests list
         await loadRequests();
 
-        // Show success message
         showSuccess('Request approved successfully!');
     } catch (error) {
         console.error('Error approving request:', error);
@@ -1268,14 +1169,11 @@ async function approveRequest(requestId) {
     }
 }
 
-// Reject class request
 async function rejectRequest(requestId) {
-    // Prompt for rejection reason
     const reason = prompt('Enter reason for rejection:');
 
-    if (reason !== null) { // Only proceed if the user didn't cancel
+    if (reason !== null) {
         try {
-            // Send rejection request
             const response = await fetch(`${API_BASE_URL}/requests/${requestId}/reject`, {
                 method: 'PUT',
                 headers: {
@@ -1290,10 +1188,8 @@ async function rejectRequest(requestId) {
                 throw new Error('Failed to reject request');
             }
 
-            // Refresh requests list
             await loadRequests();
 
-            // Show success message
             showSuccess('Request rejected successfully!');
         } catch (error) {
             console.error('Error rejecting request:', error);
@@ -1304,16 +1200,13 @@ async function rejectRequest(requestId) {
 
 // ============= ATTENDANCE MANAGEMENT =============
 
-// Load attendance data for a specific class
 async function loadAttendanceForClass(classId) {
     try {
-        // Set active class
         activeClass = classes.find(c => c.id == classId);
         if (!activeClass) return;
 
         showLoading('attendanceContent', `Loading attendance for ${activeClass.name}...`);
 
-        // Fetch students enrolled in this class
         const studentResponse = await fetch(`${API_BASE_URL}/classes/${classId}/students`);
         if (!studentResponse.ok) {
             throw new Error('Failed to load students for this class');
@@ -1321,10 +1214,8 @@ async function loadAttendanceForClass(classId) {
 
         const students = await studentResponse.json();
 
-        // Get today's date in the format YYYY-MM-DD
         const today = new Date().toISOString().slice(0, 10);
 
-        // Fetch attendance for today if exists
         const attendanceResponse = await fetch(`${API_BASE_URL}/attendance/class/${classId}/date/${today}`);
         let todayAttendance = [];
 
@@ -1332,7 +1223,6 @@ async function loadAttendanceForClass(classId) {
             todayAttendance = await attendanceResponse.json();
         }
 
-        // Update attendanceData object
         attendanceData = {
             classId: classId,
             date: today,
@@ -1340,7 +1230,6 @@ async function loadAttendanceForClass(classId) {
             attendance: todayAttendance
         };
 
-        // Update UI
         updateAttendanceUI();
 
         hideLoading('attendanceContent');
@@ -1351,7 +1240,6 @@ async function loadAttendanceForClass(classId) {
     }
 }
 
-// Update the attendance UI
 function updateAttendanceUI() {
     const container = document.getElementById('attendanceContent');
     if (!container) return;
@@ -1425,19 +1313,15 @@ function updateAttendanceUI() {
         </div>
     `;
 
-    // Add event listener for date change
     document.getElementById('attendanceDate').addEventListener('change', function (e) {
         loadAttendanceForDate(activeClass.id, e.target.value);
     });
 }
 
-// Load attendance for a specific date
 async function loadAttendanceForDate(classId, date) {
     try {
-        // Update the date in attendanceData
         attendanceData.date = date;
 
-        // Fetch attendance for the selected date
         const attendanceResponse = await fetch(`${API_BASE_URL}/attendance/class/${classId}/date/${date}`);
         let dateAttendance = [];
 
@@ -1445,10 +1329,8 @@ async function loadAttendanceForDate(classId, date) {
             dateAttendance = await attendanceResponse.json();
         }
 
-        // Update attendanceData
         attendanceData.attendance = dateAttendance;
 
-        // Update checkboxes based on loaded attendance
         const checkboxes = document.querySelectorAll('.attendance-checkbox');
         checkboxes.forEach(checkbox => {
             const studentId = parseInt(checkbox.dataset.studentId);
@@ -1463,16 +1345,13 @@ async function loadAttendanceForDate(classId, date) {
     }
 }
 
-// Save attendance data
 async function saveAttendance() {
     try {
-        // Show loading indicator
         const saveButton = document.querySelector('#attendanceContent .button.is-primary');
         const originalText = saveButton.innerHTML;
         saveButton.disabled = true;
         saveButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Saving...</span>';
 
-        // Collect attendance data from checkboxes
         const attendanceRecords = [];
         const checkboxes = document.querySelectorAll('.attendance-checkbox');
 
@@ -1485,7 +1364,6 @@ async function saveAttendance() {
             });
         });
 
-        // Send attendance data to API
         const response = await fetch(`${API_BASE_URL}/attendance/bulk`, {
             method: 'POST',
             headers: {
@@ -1498,20 +1376,16 @@ async function saveAttendance() {
             throw new Error('Failed to save attendance');
         }
 
-        // Show success message
         showSuccess('Attendance saved successfully!');
 
-        // Reload attendance data
         await loadAttendanceForDate(activeClass.id, document.getElementById('attendanceDate').value);
 
-        // Restore button state
         saveButton.disabled = false;
         saveButton.innerHTML = originalText;
     } catch (error) {
         console.error('Error saving attendance:', error);
         showError('Failed to save attendance data');
 
-        // Restore button state
         const saveButton = document.querySelector('#attendanceContent .button.is-primary');
         if (saveButton) {
             saveButton.disabled = false;
@@ -1522,9 +1396,7 @@ async function saveAttendance() {
 
 // ============= SEARCH FUNCTIONALITY =============
 
-// Setup event listeners for search inputs
 function setupSearchListeners() {
-    // Student search
     const studentSearchInput = document.getElementById('studentSearch');
     if (studentSearchInput) {
         studentSearchInput.addEventListener('keyup', function () {
@@ -1533,7 +1405,6 @@ function setupSearchListeners() {
         });
     }
 
-    // Class search
     const classSearchInput = document.getElementById('classSearch');
     if (classSearchInput) {
         classSearchInput.addEventListener('keyup', function () {
@@ -1542,7 +1413,6 @@ function setupSearchListeners() {
         });
     }
 
-    // Request search
     const requestSearchInput = document.getElementById('requestSearch');
     if (requestSearchInput) {
         requestSearchInput.addEventListener('keyup', function () {
@@ -1552,7 +1422,6 @@ function setupSearchListeners() {
     }
 }
 
-// Filter students based on search
 function filterStudents(searchTerm) {
     const tableBody = document.getElementById('studentsTableBody');
     if (!tableBody) return;
@@ -1574,7 +1443,6 @@ function filterStudents(searchTerm) {
     });
 }
 
-// Filter classes based on search
 function filterClasses(searchTerm) {
     const tableBody = document.getElementById('classesTableBody');
     if (!tableBody) return;
@@ -1596,7 +1464,6 @@ function filterClasses(searchTerm) {
     });
 }
 
-// Filter requests based on search
 function filterRequests(searchTerm) {
     const tableBody = document.getElementById('requestsTableBody');
     if (!tableBody) return;
@@ -1622,13 +1489,11 @@ function filterRequests(searchTerm) {
 
 // ============= INITIALIZATION =============
 
-// Check active tab on page load and show content accordingly
 document.addEventListener('DOMContentLoaded', function () {
     const activeTab = document.querySelector('.tabs li.is-active');
     if (activeTab) {
         const target = activeTab.dataset.target;
 
-        // Show the active tab content
         const activeContent = document.getElementById(target);
         if (activeContent) {
             activeContent.style.display = 'block';
@@ -1636,13 +1501,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Logout
 function logout() {
     if (confirm('Are you sure you want to log out?')) {
-        // Clear authentication data
         auth.clearAuth();
 
-        // Redirect to login page
         window.location.href = 'index.html';
     }
 }

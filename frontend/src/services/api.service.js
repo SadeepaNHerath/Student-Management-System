@@ -1,47 +1,52 @@
-// API service for making requests to the backend
 import {API_BASE_URL} from '../utils/constants.js';
 
 class ApiService {
-    // Auth endpoints
     static async login(username, password) {
-        return this.post('/auth/login', {username, password});
+        return this.post('/users/login', {username, password});
     }
 
-    // Student endpoints
     static async getStudents() {
-        return this.get('/students');
+        return this.get('/student/students');
     }
 
     static async getStudent(id) {
-        return this.get(`/students/${id}`);
+        return this.get(`/student/students/${id}`);
     }
 
     static async createStudent(studentData) {
-        return this.post('/students', studentData);
+        return this.post('/student/students', studentData);
     }
 
     static async updateStudent(id, studentData) {
-        return this.put(`/students/${id}`, studentData);
+        return this.put(`/student/students/${id}`, studentData);
     }
 
     static async deleteStudent(id) {
-        return this.delete(`/students/${id}`);
+        return this.delete(`/student/students/${id}`);
     }
 
-    // Class endpoints
     static async getClasses() {
         return this.get('/classes');
     }
 
     static async getClass(id) {
         return this.get(`/classes/${id}`);
-    }
-
-    static async createClass(classData) {
+    }    static async createClass(classData) {
         return this.post('/classes', classData);
     }
+    
+    static async getRequests() {
+        return this.get('/requests');
+    }
+    
+    static async approveRequest(requestId) {
+        return this.put(`/requests/${requestId}/approve`, {});
+    }
+    
+    static async rejectRequest(requestId) {
+        return this.put(`/requests/${requestId}/reject`, {});
+    }
 
-    // Attendance endpoints
     static async getAttendance(classId) {
         return this.get(`/attendance/class/${classId}`);
     }
@@ -50,7 +55,6 @@ class ApiService {
         return this.post('/attendance', attendanceData);
     }
 
-    // Private helper methods for HTTP requests
     static async get(endpoint) {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {

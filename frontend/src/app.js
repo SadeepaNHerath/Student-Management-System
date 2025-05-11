@@ -3,16 +3,15 @@
  * Handles global authentication, API calls, and navigation features
  */
 
-// Import constants and services
+import {API_BASE_URL} from './utils/constants.js';
+import ApiService from './services/api.service.js';
 
-// Authentication module
 const auth = {
     isAuthenticated: false,
     userRole: null, // 'ADMIN' or 'STUDENT'
     userId: null,
     studentId: null,
 
-    // Check if the user is authenticated
     checkAuth() {
         const authData = localStorage.getItem('auth');
         if (!authData) {
@@ -32,7 +31,6 @@ const auth = {
         }
     },
 
-    // Set authentication data
     setAuth(data) {
         this.isAuthenticated = true;
         this.userRole = data.role;
@@ -41,7 +39,6 @@ const auth = {
         localStorage.setItem('auth', JSON.stringify(data));
     },
 
-    // Clear authentication data
     clearAuth() {
         this.isAuthenticated = false;
         this.userRole = null;
@@ -50,7 +47,6 @@ const auth = {
         localStorage.removeItem('auth');
     },
 
-    // Redirect based on role
     redirectBasedOnRole() {
         if (!this.isAuthenticated) {
             window.location.href = 'login.html';
@@ -64,7 +60,6 @@ const auth = {
         }
     },
 
-    // Enforce authentication
     requireAuth() {
         if (!this.checkAuth()) {
             window.location.href = 'login.html';
@@ -72,7 +67,6 @@ const auth = {
         }
         return true;
     },
-    // Enforce admin role
     requireAdmin() {
         if (!this.checkAuth() || this.userRole !== 'ADMIN') {
             window.location.href = 'login.html';
@@ -81,7 +75,6 @@ const auth = {
         return true;
     },
 
-    // Enforce student role
     requireStudent() {
         if (!this.checkAuth() || this.userRole !== 'STUDENT') {
             window.location.href = 'login.html';
@@ -91,14 +84,16 @@ const auth = {
     }
 };
 
-// Initialize AOS animations if it exists
 if (typeof AOS !== 'undefined') {
     AOS.init();
 }
 
-// Check if we're on the index page and redirect if authenticated
 if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
     if (auth.checkAuth()) {
         auth.redirectBasedOnRole();
     }
 }
+
+window.auth = auth;
+
+export { auth as default, auth };

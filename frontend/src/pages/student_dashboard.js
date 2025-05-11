@@ -7,45 +7,39 @@
  * - Viewing attendance history
  */
 
-// Initialize global variables
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
+
 let currentStudent = {};
 let enrolledClasses = [];
 let availableClasses = [];
 let attendanceRecords = [];
 let classAttendancePercentages = {};
 
-// Initialize when the page loads
 document.addEventListener('DOMContentLoaded', async function () {
-    // Make sure user is authenticated as student
     if (!auth.requireStudent()) {
-        return; // This will redirect to login if not authenticated
+        return;
     }
 
-    // Load student data based on ID from auth
     await loadStudentData(auth.studentId);
 });
 
-// Function to load all student data with the given student ID
 async function loadStudentData(studentId) {
     try {
         showLoading('dashboardContent', 'Loading dashboard data...');
-        // Fetch student information
-        const response = await fetch(`${API_BASE_URL}/student/students/${studentId}`);
-        if (!response.ok) throw new Error('Failed to fetch student data');
-        currentStudent = await response.json();
+        currentStudent = await ApiService.getStudent(studentId);
+        
+        if (!currentStudent) throw new Error('Failed to fetch student data');
 
-        // Format some data for display
         currentStudent.firstName = currentStudent.fName;
         currentStudent.lastName = currentStudent.lName;
 
-        // Load related data
         await Promise.all([
             loadEnrolledClasses(studentId),
             loadAvailableClasses(studentId),
             loadAttendanceHistory(studentId)
         ]);
 
-        // Update the UI with all the data
         loadStudentProfile();
 
         hideLoading('dashboardContent');
@@ -56,7 +50,6 @@ async function loadStudentData(studentId) {
     }
 }
 
-// Show loading indicator
 function showLoading(containerId, message) {
     const container = document.getElementById(containerId);
     if (container) {
@@ -71,12 +64,9 @@ function showLoading(containerId, message) {
     }
 }
 
-// Hide loading indicator
 function hideLoading(containerId) {
-    // Do nothing, content will be replaced by the respective load functions
 }
 
-// Show error message
 function showError(message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'notification is-danger';
@@ -87,12 +77,10 @@ function showError(message) {
 
     document.querySelector('section.section').prepend(errorDiv);
 
-    // Add event listener to close button
     errorDiv.querySelector('.delete').addEventListener('click', () => {
         errorDiv.remove();
     });
 
-    // Auto-remove after 5 seconds
     setTimeout(() => {
         if (errorDiv.parentNode) {
             errorDiv.remove();
@@ -100,7 +88,6 @@ function showError(message) {
     }, 5000);
 }
 
-// Profile functions
 async function loadStudentProfile() {
     try {
         // Convert the binary profile picture to a data URL
@@ -122,13 +109,11 @@ async function loadStudentProfile() {
     }
 }
 
-// Edit profile button event handler
 document.getElementById('editProfileBtn').addEventListener('click', function () {
     openEditProfileModal();
 });
 
 function openEditProfileModal() {
-    // Create modal HTML
     const modalHTML = `
         <div class="modal is-active" id="editProfileModal">
             <div class="modal-background"></div>
@@ -186,10 +171,8 @@ function openEditProfileModal() {
         </div>
     `;
 
-    // Add modal to the body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    // Add file input handler
     document.getElementById('profilePicUpload').addEventListener('change', function () {
         const fileName = this.files[0]?.name || 'No file selected';
         document.getElementById('fileName').textContent = fileName;
@@ -204,24 +187,20 @@ function closeEditProfileModal() {
 }
 
 async function saveProfileChanges() {
-    // Show loading state
     const saveButton = document.querySelector('#editProfileModal .button.is-success');
     const originalText = saveButton.textContent;
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Saving...</span>';
 
     try {
-        // Get updated values
         const firstName = document.getElementById('editFirstName').value;
         const lastName = document.getElementById('editLastName').value;
         const address = document.getElementById('editAddress').value;
         const contact = document.getElementById('editContact').value;
         const fileInput = document.getElementById('profilePicUpload');
 
-        // Create FormData object for multipart/form-data request
         const formData = new FormData();
 
-        // Create student object
         const updatedStudent = {
             ...currentStudent,
             fName: firstName,
@@ -230,21 +209,17 @@ async function saveProfileChanges() {
             contact: contact
         };
 
-        // Add JSON data as a blob
         const studentBlob = new Blob([JSON.stringify(updatedStudent)], {
             type: 'application/json'
         });
         formData.append('student', studentBlob);
 
-        // Add profile picture if selected
         if (fileInput.files.length > 0) {
             formData.append('profilePicture', fileInput.files[0]);
         } else {
-            // Create an empty file to satisfy the API
             const emptyBlob = new Blob([''], {type: 'application/octet-stream'});
             formData.append('profilePicture', emptyBlob, 'empty.txt');
         }
-        // Send update request
         const response = await fetch(`${API_BASE_URL}/student/students`, {
             method: 'PATCH',
             body: formData
@@ -254,7 +229,6 @@ async function saveProfileChanges() {
             throw new Error('Failed to update profile');
         }
 
-        // Update the current student object
         currentStudent.firstName = firstName;
         currentStudent.lastName = lastName;
         currentStudent.fName = firstName;
@@ -262,19 +236,15 @@ async function saveProfileChanges() {
         currentStudent.address = address;
         currentStudent.contact = contact;
 
-        // Refresh the UI
         loadStudentProfile();
 
-        // Close the modal
         closeEditProfileModal();
 
-        // Show success message
         showSuccess('Profile updated successfully!');
     } catch (error) {
         console.error('Error updating profile:', error);
         showError('Failed to update profile. Please try again.');
 
-        // Restore button state
         saveButton.disabled = false;
         saveButton.textContent = originalText;
     }
@@ -290,12 +260,10 @@ function showSuccess(message) {
 
     document.querySelector('section.section').prepend(successDiv);
 
-    // Add event listener to close button
     successDiv.querySelector('.delete').addEventListener('click', () => {
         successDiv.remove();
     });
 
-    // Auto-remove after 5 seconds
     setTimeout(() => {
         if (successDiv.parentNode) {
             successDiv.remove();
@@ -303,22 +271,18 @@ function showSuccess(message) {
     }, 3000);
 }
 
-// Classes functions
 async function loadEnrolledClasses(studentId) {
     try {
-        // Fetch enrolled classes
         const response = await fetch(`${API_BASE_URL}/classes/student/${studentId}`);
         if (!response.ok) throw new Error('Failed to fetch enrolled classes');
 
         enrolledClasses = await response.json();
 
-        // Fetch attendance percentages
         const percentageResponse = await fetch(`${API_BASE_URL}/attendance/student/${studentId}/percentage`);
         if (percentageResponse.ok) {
             classAttendancePercentages = await percentageResponse.json();
         }
 
-        // Update UI
         updateEnrolledClassesUI();
     } catch (error) {
         console.error('Error loading enrolled classes:', error);
@@ -343,7 +307,6 @@ function updateEnrolledClassesUI() {
     }
 
     enrolledClasses.forEach(cls => {
-        // Get attendance percentage from our map, default to 0 if not found
         const attendancePercentage = classAttendancePercentages[cls.id] || 0;
 
         const row = document.createElement('tr');
@@ -376,7 +339,6 @@ function viewClassDetails(classId) {
     const classObj = enrolledClasses.find(c => c.id == classId);
     if (!classObj) return;
 
-    // Create modal HTML
     const modalHTML = `
         <div class="modal is-active" id="classDetailsModal">
             <div class="modal-background"></div>
@@ -401,7 +363,6 @@ function viewClassDetails(classId) {
         </div>
     `;
 
-    // Add modal to the body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -414,13 +375,11 @@ function closeClassDetailsModal() {
 
 async function loadAvailableClasses(studentId) {
     try {
-        // Fetch available classes (classes the student is not enrolled in)
         const response = await fetch(`${API_BASE_URL}/classes/student/${studentId}/available`);
         if (!response.ok) throw new Error('Failed to fetch available classes');
 
         availableClasses = await response.json();
 
-        // Update UI
         updateAvailableClassesUI();
     } catch (error) {
         console.error('Error loading available classes:', error);
@@ -470,7 +429,6 @@ function updateAvailableClassesUI() {
 }
 
 async function applyForClass(classId) {
-    // Find the class
     const classToApply = availableClasses.find(cls => cls.id == classId);
 
     if (!classToApply) return;
@@ -482,7 +440,6 @@ Period: ${new Date(classToApply.startDate).toLocaleDateString()} to ${new Date(c
 
     if (confirm(confirmMsg)) {
         try {
-            // Send request to the API
             const response = await fetch(`${API_BASE_URL}/requests`, {
                 method: 'POST',
                 headers: {
@@ -499,10 +456,8 @@ Period: ${new Date(classToApply.startDate).toLocaleDateString()} to ${new Date(c
                 throw new Error(errorData.message || 'Failed to apply for class');
             }
 
-            // Show success message
             showSuccess('Application sent successfully! Waiting for admin approval.');
 
-            // Refresh available classes
             await loadAvailableClasses(auth.studentId);
         } catch (error) {
             console.error('Error applying for class:', error);
@@ -511,16 +466,13 @@ Period: ${new Date(classToApply.startDate).toLocaleDateString()} to ${new Date(c
     }
 }
 
-// Attendance history functions
 async function loadAttendanceHistory(studentId) {
     try {
-        // Fetch attendance records
         const response = await fetch(`${API_BASE_URL}/attendance/student/${studentId}`);
         if (!response.ok) throw new Error('Failed to fetch attendance records');
 
         attendanceRecords = await response.json();
 
-        // Update UI
         updateAttendanceHistoryUI();
     } catch (error) {
         console.error('Error loading attendance history:', error);
@@ -530,7 +482,6 @@ async function loadAttendanceHistory(studentId) {
 }
 
 function updateAttendanceHistoryUI() {
-    // First load the attendance records
     const tableBody = document.getElementById('attendanceTableBody');
     if (!tableBody) return;
 
@@ -561,24 +512,19 @@ function updateAttendanceHistoryUI() {
         tableBody.appendChild(row);
     });
 
-    // Then set up the class tabs for filtering
     const tabsList = document.getElementById('classTabsList');
     if (!tabsList) return;
 
-    // Clear existing tabs except the first "All Classes" tab
     while (tabsList.children.length > 1) {
         tabsList.removeChild(tabsList.lastChild);
     }
 
-    // Ensure "All Classes" tab is active
     if (tabsList.firstChild) {
         tabsList.firstChild.classList.add('is-active');
     }
 
-    // Get unique class names from records
     const classNames = [...new Set(attendanceRecords.map(record => record.classAttended.name))];
 
-    // Add a tab for each class
     classNames.forEach(className => {
         const li = document.createElement('li');
         li.innerHTML = `<a onclick="filterAttendanceByClass('${className}')">${className}</a>`;
@@ -587,7 +533,6 @@ function updateAttendanceHistoryUI() {
 }
 
 function filterAttendanceByClass(className) {
-    // Set active tab
     document.querySelectorAll('#classTabsList li').forEach(li => {
         li.classList.remove('is-active');
     });
@@ -595,20 +540,16 @@ function filterAttendanceByClass(className) {
     if (className === 'all') {
         document.querySelector('#classTabsList li:first-child').classList.add('is-active');
 
-        // Show all records
         updateAttendanceHistoryUI();
     } else {
-        // Find the tab by content and set it active
         document.querySelectorAll('#classTabsList li a').forEach(a => {
             if (a.textContent === className) {
                 a.parentElement.classList.add('is-active');
             }
         });
 
-        // Filter records by class
         const filteredRecords = attendanceRecords.filter(record => record.classAttended.name === className);
 
-        // Update table
         const tableBody = document.getElementById('attendanceTableBody');
         tableBody.innerHTML = '';
 
@@ -641,10 +582,8 @@ function filterAttendanceByClass(className) {
 
 function logout() {
     if (confirm('Are you sure you want to log out?')) {
-        // Clear authentication data
         auth.clearAuth();
 
-        // Redirect to login page
         window.location.href = 'index.html';
     }
 }

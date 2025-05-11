@@ -6,93 +6,84 @@
  * - Bulk actions on multiple requests
  */
 
-// Mock data for demonstration
-let classes = [
-    {id: "CLS001", name: "Web Development"},
-    {id: "CLS002", name: "Java Programming"},
-    {id: "CLS003", name: "Database Design"},
-    {id: "CLS004", name: "Mobile App Development"},
-    {id: "CLS005", name: "Python for Data Science"}
-];
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
 
-let students = [
-    {id: "STU001", firstName: "John", lastName: "Doe"},
-    {id: "STU002", firstName: "Jane", lastName: "Smith"},
-    {id: "STU003", firstName: "Robert", lastName: "Johnson"},
-    {id: "STU004", firstName: "Emily", lastName: "Brown"},
-    {id: "STU005", firstName: "Michael", lastName: "Davis"},
-    {id: "STU006", firstName: "Sarah", lastName: "Wilson"}
-];
-
-let requests = [
-    {
-        id: "REQ001",
-        studentId: "STU001",
-        classId: "CLS003",
-        date: "2025-05-08",
-        status: "pending",
-        message: "I'm interested in learning database design to complement my web development skills.",
-        feedback: ""
-    },
-    {
-        id: "REQ002",
-        studentId: "STU002",
-        classId: "CLS003",
-        date: "2025-05-07",
-        status: "approved",
-        message: "I want to join this class to improve my database knowledge.",
-        feedback: "Approved! Looking forward to having you in the class."
-    },
-    {
-        id: "REQ003",
-        studentId: "STU003",
-        classId: "CLS002",
-        date: "2025-05-06",
-        status: "rejected",
-        message: "I need to learn Java to advance in my career.",
-        feedback: "Sorry, the class is currently full. Please try again for the next session."
-    },
-    {
-        id: "REQ004",
-        studentId: "STU004",
-        classId: "CLS004",
-        date: "2025-05-05",
-        status: "pending",
-        message: "I'm interested in mobile development and would like to join this class.",
-        feedback: ""
-    },
-    {
-        id: "REQ005",
-        studentId: "STU005",
-        classId: "CLS001",
-        date: "2025-05-04",
-        status: "pending",
-        message: "I need to learn web development for my project.",
-        feedback: ""
-    },
-    {
-        id: "REQ006",
-        studentId: "STU006",
-        classId: "CLS005",
-        date: "2025-05-03",
-        status: "approved",
-        message: "I want to learn Python for data science to advance my career.",
-        feedback: "Welcome to the class! We're excited to have you."
-    }
-];
-
+let classes = [];
+let students = [];
+let requests = [];
 let selectedRequests = [];
 
-// Initialize when the page loads
 document.addEventListener('DOMContentLoaded', function () {
-    // Populate class dropdown
-    populateClassDropdown();
-
-    // Load requests with default filter (pending)
-    filterRequests();
+    loadClasses();
+    loadStudents();
+    loadRequests();
 });
 
-// Populate class dropdown
+async function loadClasses() {
+    try {
+        classes = await ApiService.getClasses();
+        
+        if (!classes) {
+            throw new Error('Failed to load classes');
+        }
+        
+        populateClassDropdown();
+    } catch (error) {
+        console.error('Error loading classes:', error);
+        showError('Failed to load classes data. Please try again later.');
+    }
+}
+
+async function loadStudents() {
+    try {
+        students = await ApiService.getStudents();
+        
+        if (!students) {
+            throw new Error('Failed to load students');
+        }
+    } catch (error) {
+        console.error('Error loading students:', error);
+        showError('Failed to load students data. Please try again later.');
+    }
+}
+
+async function loadRequests() {
+    try {
+        requests = await ApiService.getRequests();
+        
+        if (!requests) {
+            throw new Error('Failed to load requests');
+        }
+        
+        filterRequests();
+    } catch (error) {
+        console.error('Error loading requests:', error);
+        showError('Failed to load requests data. Please try again later.');
+    }
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification is-danger';
+    errorDiv.innerHTML = `
+        <button class="delete"></button>
+        ${message}
+    `;
+
+    document.querySelector('section.section').prepend(errorDiv);
+
+    errorDiv.querySelector('.delete').addEventListener('click', () => {
+        errorDiv.remove();
+    });
+
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
 function populateClassDropdown() {
     const classFilter = document.getElementById('classFilter');
 
@@ -104,18 +95,15 @@ function populateClassDropdown() {
     });
 }
 
-// Filter requests based on selected filters
 function filterRequests() {
     const statusFilter = document.getElementById('statusFilter').value;
     const classFilter = document.getElementById('classFilter').value;
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-    // Reset selected requests
     selectedRequests = [];
     document.getElementById('selectAllCheckbox').checked = false;
     updateBulkActionControls();
 
-    // Apply filters
     let filteredRequests = requests;
 
     if (statusFilter !== 'all') {
@@ -136,21 +124,17 @@ function filterRequests() {
         });
     }
 
-    // Update the request count
     document.getElementById('requestCount').textContent = filteredRequests.length;
 
-    // Display requests or show no results message
     if (filteredRequests.length === 0) {
         document.getElementById('noRequestsMessage').style.display = 'block';
     } else {
         document.getElementById('noRequestsMessage').style.display = 'none';
     }
 
-    // Populate the table
     populateRequestsTable(filteredRequests);
 }
 
-// Populate requests table
 function populateRequestsTable(filteredRequests) {
     const tableBody = document.getElementById('requestsTableBody');
     tableBody.innerHTML = '';
@@ -162,15 +146,12 @@ function populateRequestsTable(filteredRequests) {
     filteredRequests.forEach(request => {
         const row = document.createElement('tr');
 
-        // Get student name from ID
         const student = students.find(s => s.id === request.studentId);
         const studentName = student ? `${student.firstName} ${student.lastName}` : request.studentId;
 
-        // Get class name from ID
         const classObj = classes.find(c => c.id === request.classId);
         const className = classObj ? classObj.name : request.classId;
 
-        // Create status badge based on status
         let statusBadge = '';
         if (request.status === 'pending') {
             statusBadge = '<span class="tag is-warning">Pending</span>';
@@ -215,13 +196,11 @@ function populateRequestsTable(filteredRequests) {
     });
 }
 
-// Format date for display
 function formatDate(dateString) {
     const options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Toggle select all checkboxes
 function toggleSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     const checkboxes = document.querySelectorAll('.request-checkbox:not([disabled])');
@@ -239,7 +218,6 @@ function toggleSelectAll() {
     updateBulkActionControls();
 }
 
-// Update selected requests array when checkbox changes
 function updateSelectedRequests(checkbox) {
     if (checkbox.checked && !selectedRequests.includes(checkbox.value)) {
         selectedRequests.push(checkbox.value);
@@ -250,7 +228,6 @@ function updateSelectedRequests(checkbox) {
     updateBulkActionControls();
 }
 
-// Update bulk action controls visibility
 function updateBulkActionControls() {
     const bulkActionControls = document.getElementById('bulkActionControls');
     const selectedCount = document.getElementById('selectedCount');
@@ -263,20 +240,16 @@ function updateBulkActionControls() {
     }
 }
 
-// View request details
 function viewRequestDetails(requestId) {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
 
-    // Get student name from ID
     const student = students.find(s => s.id === request.studentId);
     const studentName = student ? `${student.firstName} ${student.lastName}` : request.studentId;
 
-    // Get class name from ID
     const classObj = classes.find(c => c.id === request.classId);
     const className = classObj ? classObj.name : request.classId;
 
-    // Create status badge based on status
     let statusBadge = '';
     if (request.status === 'pending') {
         statusBadge = '<span class="tag is-warning">Pending</span>';
@@ -286,7 +259,6 @@ function viewRequestDetails(requestId) {
         statusBadge = '<span class="tag is-danger">Rejected</span>';
     }
 
-    // Fill modal content
     const content = document.getElementById('requestDetailsContent');
     content.innerHTML = `
         <div class="block">
@@ -346,7 +318,6 @@ function viewRequestDetails(requestId) {
         </div>
     `;
 
-    // Setup action buttons
     const actionButtons = document.getElementById('requestActionButtons');
 
     if (request.status === 'pending') {
@@ -368,49 +339,55 @@ function viewRequestDetails(requestId) {
         actionButtons.innerHTML = '';
     }
 
-    // Show modal
     document.getElementById('requestDetailsModal').classList.add('is-active');
 }
 
-// Close request details modal
 function closeRequestDetailsModal() {
     document.getElementById('requestDetailsModal').classList.remove('is-active');
 }
 
-// Approve request
-function approveRequest(requestId) {
-    const request = requests.find(r => r.id === requestId);
-    if (!request) return;
+async function approveRequest(requestId) {
+    try {
+        await ApiService.approveRequest(requestId);
+        
+        const request = requests.find(r => r.id === requestId);
+        if (request) {
+            request.status = 'approved';
+            request.feedback = "Request approved.";
+        }
 
-    request.status = 'approved';
-    request.feedback = "Request approved.";
-
-    // Refresh the table
-    filterRequests();
-
-    alert(`Request ${requestId} has been approved.`);
+        filterRequests();
+        
+        alert(`Request ${requestId} has been approved.`);
+    } catch (error) {
+        console.error('Error approving request:', error);
+        showError('Failed to approve request. Please try again later.');
+    }
 }
 
-// Reject request
-function rejectRequest(requestId) {
-    const request = requests.find(r => r.id === requestId);
-    if (!request) return;
+async function rejectRequest(requestId) {
+    try {
+        await ApiService.rejectRequest(requestId);
+        
+        // Update local data
+        const request = requests.find(r => r.id === requestId);
+        if (request) {
+            request.status = 'rejected';
+            request.feedback = "Request rejected.";
+        }
 
-    request.status = 'rejected';
-    request.feedback = "Request rejected.";
-
-    // Refresh the table
-    filterRequests();
-
-    alert(`Request ${requestId} has been rejected.`);
+        filterRequests();
+        
+        alert(`Request ${requestId} has been rejected.`);
+    } catch (error) {
+        console.error('Error rejecting request:', error);
+        showError('Failed to reject request. Please try again later.');
+    }
 }
 
-// Approve with feedback
 function approveRequestWithFeedback(requestId) {
-    // Close the details modal
     closeRequestDetailsModal();
 
-    // Open the feedback modal
     document.getElementById('feedbackModalTitle').textContent = 'Approve Request';
     document.getElementById('feedbackMessage').value = "Approved! Welcome to the class.";
     document.getElementById('feedbackRequestId').value = requestId;
@@ -422,12 +399,9 @@ function approveRequestWithFeedback(requestId) {
     document.getElementById('addFeedbackModal').classList.add('is-active');
 }
 
-// Reject with feedback
 function rejectRequestWithFeedback(requestId) {
-    // Close the details modal
     closeRequestDetailsModal();
 
-    // Open the feedback modal
     document.getElementById('feedbackModalTitle').textContent = 'Reject Request';
     document.getElementById('feedbackMessage').value = "We're sorry, but your request has been rejected.";
     document.getElementById('feedbackRequestId').value = requestId;
@@ -439,12 +413,10 @@ function rejectRequestWithFeedback(requestId) {
     document.getElementById('addFeedbackModal').classList.add('is-active');
 }
 
-// Close feedback modal
 function closeFeedbackModal() {
     document.getElementById('addFeedbackModal').classList.remove('is-active');
 }
 
-// Submit feedback
 function submitFeedback() {
     const requestId = document.getElementById('feedbackRequestId').value;
     const action = document.getElementById('feedbackAction').value;
@@ -453,20 +425,16 @@ function submitFeedback() {
     const request = requests.find(r => r.id === requestId);
     if (!request) return;
 
-    // Update request status and feedback
     request.status = action === 'approve' ? 'approved' : 'rejected';
     request.feedback = feedback;
 
-    // Close modal
     closeFeedbackModal();
 
-    // Refresh the table
     filterRequests();
 
     alert(`Request ${requestId} has been ${action === 'approve' ? 'approved' : 'rejected'}.`);
 }
 
-// Approve all pending requests
 function approveAllPending() {
     if (confirm('Are you sure you want to approve all pending requests?')) {
         let count = 0;
@@ -479,14 +447,12 @@ function approveAllPending() {
             }
         });
 
-        // Refresh the table
         filterRequests();
 
         alert(`${count} pending requests have been approved.`);
     }
 }
 
-// Bulk approve selected requests
 function bulkApprove() {
     if (selectedRequests.length === 0) {
         alert('No requests selected.');
@@ -502,17 +468,14 @@ function bulkApprove() {
             }
         });
 
-        // Reset selected requests
         selectedRequests = [];
 
-        // Refresh the table
         filterRequests();
 
         alert('Selected requests have been approved.');
     }
 }
 
-// Bulk reject selected requests
 function bulkReject() {
     if (selectedRequests.length === 0) {
         alert('No requests selected.');
@@ -528,10 +491,8 @@ function bulkReject() {
             }
         });
 
-        // Reset selected requests
         selectedRequests = [];
 
-        // Refresh the table
         filterRequests();
 
         alert('Selected requests have been rejected.');

@@ -1,56 +1,82 @@
 /**
  * Attendance Management JavaScript
  * Handles functionality for the attendance management page including:
- * - Loading students for a class
- * - Marking attendance
  * - Saving attendance records
  * - Viewing attendance history
  */
 
-// Mock data for demonstration
-let classes = [
-    {
-        id: "CLS001",
-        name: "Web Development",
-        schedule: "Mon, Wed 10:00-12:00",
-        status: "active"
-    },
-    {
-        id: "CLS002",
-        name: "Java Programming",
-        schedule: "Tue, Thu 14:00-16:00",
-        status: "active"
-    },
-    {
-        id: "CLS003",
-        name: "Database Design",
-        schedule: "Fri 09:00-13:00",
-        status: "upcoming"
-    },
-    {
-        id: "CLS004",
-        name: "Mobile App Development",
-        schedule: "Mon, Wed 14:00-16:00",
-        status: "upcoming"
-    },
-    {
-        id: "CLS005",
-        name: "Python for Data Science",
-        schedule: "Tue, Thu 09:00-11:00",
-        status: "completed"
+import ApiService from '../services/api.service.js';
+import {API_BASE_URL} from '../utils/constants.js';
+
+let classes = [];
+let students = [];
+
+function showLoading(containerId, message) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = `
+            <div class="has-text-centered p-6">
+                <span class="icon is-large">
+                    <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                </span>
+                <p class="mt-3">${message || 'Loading...'}</p>
+            </div>
+        `;
     }
-];
+}
 
-let students = [
-    {id: "STU001", firstName: "John", lastName: "Doe", enrolledClasses: ["CLS001", "CLS002"]},
-    {id: "STU002", firstName: "Jane", lastName: "Smith", enrolledClasses: ["CLS002"]},
-    {id: "STU003", firstName: "Robert", lastName: "Johnson", enrolledClasses: ["CLS001"]},
-    {id: "STU004", firstName: "Emily", lastName: "Brown", enrolledClasses: ["CLS001", "CLS002"]},
-    {id: "STU005", firstName: "Michael", lastName: "Davis", enrolledClasses: ["CLS001"]},
-    {id: "STU006", firstName: "Sarah", lastName: "Wilson", enrolledClasses: ["CLS002", "CLS001"]}
-];
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification is-danger';
+    errorDiv.innerHTML = `
+        <button class="delete"></button>
+        ${message}
+    `;
 
-// Mock attendance history
+    document.querySelector('section.section').prepend(errorDiv);
+
+    errorDiv.querySelector('.delete').addEventListener('click', () => {
+        errorDiv.remove();
+    });
+
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+async function loadClasses() {
+    try {
+        classes = await ApiService.getClasses();
+        
+        if (!classes) {
+            throw new Error('Failed to load classes');
+        }
+        
+        populateClassDropdowns();
+    } catch (error) {
+        console.error('Error loading classes:', error);
+        showError('Failed to load classes data. Please try again later.');
+    }
+}
+
+async function loadStudents(classId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/student/students/class/${classId}`);
+        if (!response.ok) {
+            throw new Error('Failed to load students');
+        }
+        
+        students = await response.json();
+        return students;
+    } catch (error) {
+        console.error('Error loading students:', error);
+        showError('Failed to load students data. Please try again later.');
+        return [];
+    }
+}
+
 let attendanceHistory = [
     {
         date: "2025-05-08",
@@ -95,30 +121,23 @@ let attendanceHistory = [
     }
 ];
 
-// Current attendance sheet data
 let currentAttendanceData = [];
 let selectedClassId = "";
 let selectedDate = "";
 
-// Initialize when the page loads
 document.addEventListener('DOMContentLoaded', function () {
-    // Set today's date as default
     document.getElementById('attendanceDate').valueAsDate = new Date();
     selectedDate = document.getElementById('attendanceDate').value;
 
-    // Populate class dropdown menus
     populateClassDropdowns();
 
-    // Load attendance history
     loadAttendanceHistory();
 });
 
-// Populate class dropdowns
 function populateClassDropdowns() {
     const classSelect = document.getElementById('classSelect');
     const historyClassSelect = document.getElementById('historyClassSelect');
 
-    // Clear existing options except the first one
     while (classSelect.options.length > 1) {
         classSelect.remove(1);
     }
@@ -127,7 +146,6 @@ function populateClassDropdowns() {
         historyClassSelect.remove(1);
     }
 
-    // Only add active classes to main dropdown
     const activeClasses = classes.filter(cls => cls.status === 'active');
     activeClasses.forEach(cls => {
         const option = document.createElement('option');
@@ -136,7 +154,6 @@ function populateClassDropdowns() {
         classSelect.appendChild(option);
     });
 
-    // Add all classes to history dropdown
     classes.forEach(cls => {
         const option = document.createElement('option');
         option.value = cls.id;
@@ -145,8 +162,7 @@ function populateClassDropdowns() {
     });
 }
 
-// Load students for selected class
-function loadStudentsForClass() {
+async function loadStudentsForClass() {
     selectedClassId = document.getElementById('classSelect').value;
 
     if (!selectedClassId) {
@@ -154,15 +170,16 @@ function loadStudentsForClass() {
         document.getElementById('noStudentsMessage').style.display = 'block';
         return;
     }
+    
+    showLoading('attendanceContainer', 'Loading students for this class...');
+    
+    const classStudents = await loadStudents(selectedClassId);
 
-    // Get the selected class
     const selectedClass = classes.find(cls => cls.id === selectedClassId);
     if (!selectedClass) return;
 
-    // Set the class title
     document.getElementById('attendanceClassTitle').textContent = `${selectedClass.name} - Attendance`;
 
-    // Get students in this class
     const studentsInClass = students.filter(student =>
         student.enrolledClasses.includes(selectedClassId)
     );
@@ -173,35 +190,28 @@ function loadStudentsForClass() {
         return;
     }
 
-    // Show the attendance sheet
     document.getElementById('attendanceSheet').style.display = 'block';
     document.getElementById('noStudentsMessage').style.display = 'none';
 
-    // Load attendance data if available for this date
     loadAttendanceData();
 }
 
-// Load attendance data for selected class and date
 function loadAttendanceData() {
     selectedDate = document.getElementById('attendanceDate').value;
 
     if (!selectedClassId || !selectedDate) return;
 
-    // Get students in this class
     const studentsInClass = students.filter(student =>
         student.enrolledClasses.includes(selectedClassId)
     );
 
-    // Check if attendance already exists for this date and class
     const existingAttendance = attendanceHistory.find(record =>
         record.classId === selectedClassId && record.date === selectedDate
     );
 
-    // Prepare attendance data
     currentAttendanceData = [];
 
     if (existingAttendance) {
-        // Use existing attendance data
         existingAttendance.studentRecords.forEach(record => {
             currentAttendanceData.push({
                 studentId: record.studentId,
@@ -211,28 +221,23 @@ function loadAttendanceData() {
             });
         });
 
-        // Update attendance summary
         updateAttendanceSummary();
     } else {
-        // Create new attendance entries for each student
         studentsInClass.forEach(student => {
             currentAttendanceData.push({
                 studentId: student.id,
                 studentName: `${student.firstName} ${student.lastName}`,
-                status: 'present', // Default to present
+                status: 'present',
                 notes: ''
             });
         });
 
-        // Update attendance summary
         updateAttendanceSummary();
     }
 
-    // Populate the attendance table
     populateAttendanceTable();
 }
 
-// Populate the attendance table
 function populateAttendanceTable() {
     const tableBody = document.getElementById('attendanceTableBody');
     tableBody.innerHTML = '';
@@ -284,7 +289,6 @@ function populateAttendanceTable() {
     });
 }
 
-// Update attendance status for a student
 function updateAttendanceStatus(index, status) {
     if (index < 0 || index >= currentAttendanceData.length) return;
 
@@ -292,14 +296,12 @@ function updateAttendanceStatus(index, status) {
     updateAttendanceSummary();
 }
 
-// Update attendance notes for a student
 function updateAttendanceNotes(index, notes) {
     if (index < 0 || index >= currentAttendanceData.length) return;
 
     currentAttendanceData[index].notes = notes;
 }
 
-// Mark all students as present
 function markAllPresent() {
     if (currentAttendanceData.length === 0) return;
 
@@ -311,7 +313,6 @@ function markAllPresent() {
     updateAttendanceSummary();
 }
 
-// Mark all students as absent
 function markAllAbsent() {
     if (currentAttendanceData.length === 0) return;
 
@@ -323,7 +324,6 @@ function markAllAbsent() {
     updateAttendanceSummary();
 }
 
-// Update attendance summary
 function updateAttendanceSummary() {
     if (currentAttendanceData.length === 0) {
         document.getElementById('attendanceSummary').textContent = 'No students';
@@ -343,29 +343,24 @@ function updateAttendanceSummary() {
     `;
 }
 
-// Save attendance records
 function saveAttendance() {
     if (currentAttendanceData.length === 0 || !selectedClassId || !selectedDate) {
         alert('No attendance data to save');
         return;
     }
 
-    // Get the selected class
     const selectedClass = classes.find(cls => cls.id === selectedClassId);
     if (!selectedClass) return;
 
-    // Calculate attendance summary
     const totalStudents = currentAttendanceData.length;
     const presentCount = currentAttendanceData.filter(a => a.status === 'present').length;
     const absentCount = totalStudents - presentCount;
 
-    // Check if attendance already exists for this date and class
     const existingIndex = attendanceHistory.findIndex(record =>
         record.classId === selectedClassId && record.date === selectedDate
     );
 
     if (existingIndex !== -1) {
-        // Update existing attendance record
         attendanceHistory[existingIndex] = {
             date: selectedDate,
             classId: selectedClassId,
@@ -376,7 +371,6 @@ function saveAttendance() {
             studentRecords: [...currentAttendanceData]
         };
     } else {
-        // Add new attendance record
         attendanceHistory.push({
             date: selectedDate,
             classId: selectedClassId,
@@ -388,25 +382,21 @@ function saveAttendance() {
         });
     }
 
-    // Reload attendance history
     loadAttendanceHistory();
 
     alert('Attendance saved successfully!');
 }
 
-// Load attendance history
 function loadAttendanceHistory() {
     const classFilter = document.getElementById('historyClassSelect').value;
     const tableBody = document.getElementById('attendanceHistoryTableBody');
     tableBody.innerHTML = '';
 
-    // Filter history by class if selected
     let filteredHistory = attendanceHistory;
     if (classFilter) {
         filteredHistory = attendanceHistory.filter(record => record.classId === classFilter);
     }
 
-    // Sort by date (newest first)
     filteredHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     if (filteredHistory.length === 0) {
@@ -449,23 +439,18 @@ function loadAttendanceHistory() {
     });
 }
 
-// Format date for display
 function formatDate(dateString) {
     const options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// View attendance details
 function viewAttendanceDetails(classId, date) {
-    // Find the attendance record
     const record = attendanceHistory.find(r => r.classId === classId && r.date === date);
 
     if (!record) return;
 
-    // Set modal title
     document.getElementById('attendanceDetailsTitle').textContent = `${record.className} - ${formatDate(record.date)}`;
 
-    // Populate the details table
     const tableBody = document.getElementById('attendanceDetailsTableBody');
     tableBody.innerHTML = '';
 
@@ -494,28 +479,23 @@ function viewAttendanceDetails(classId, date) {
         });
     }
 
-    // Show the modal
     document.getElementById('attendanceDetailsModal').classList.add('is-active');
 }
 
-// Close attendance details modal
 function closeAttendanceDetailsModal() {
     document.getElementById('attendanceDetailsModal').classList.remove('is-active');
 }
 
-// Print attendance details
 function printAttendanceDetails() {
     window.print();
 }
 
-// Delete attendance record
 function deleteAttendanceRecord(classId, date) {
     if (confirm('Are you sure you want to delete this attendance record? This action cannot be undone.')) {
         attendanceHistory = attendanceHistory.filter(record =>
             !(record.classId === classId && record.date === date)
         );
 
-        // Reload attendance history
         loadAttendanceHistory();
 
         alert('Attendance record deleted successfully!');
