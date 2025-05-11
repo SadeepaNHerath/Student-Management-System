@@ -38,16 +38,16 @@ public class ClassRequestController {
         try {
             Integer studentId = requestData.get("studentId");
             Integer classId = requestData.get("classId");
-            
+
             if (studentId == null || classId == null) {
                 return ResponseEntity.badRequest().body("Student ID and Class ID are required");
             }
-            
+
             if (classRequestService.hasExistingRequest(studentId, classId)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("A pending request for this class already exists");
+                        .body("A pending request for this class already exists");
             }
-            
+
             ClassRequest createdRequest = classRequestService.createRequest(studentId, classId);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
         } catch (Exception e) {

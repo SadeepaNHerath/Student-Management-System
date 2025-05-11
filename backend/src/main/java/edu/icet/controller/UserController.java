@@ -74,15 +74,15 @@ public class UserController {
                 response.put("authenticated", true);
                 response.put("role", user.getRole());
                 response.put("userId", user.getId());
-                
+
                 if (user.getStudent() != null) {
                     response.put("studentId", user.getStudent().getId());
                 }
-                
+
                 return ResponseEntity.ok(response);
             }
         }
-        
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
