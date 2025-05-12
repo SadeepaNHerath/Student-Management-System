@@ -35,16 +35,18 @@ async function loadProfile() {
         const student = await ApiService.getStudent(studentId);
         
         if (student) {
-            document.getElementById('profilePhotoCard').src = `data:image/jpeg;base64,${student.profilePic}`;
+            if (student.profilePic) {
+                document.getElementById('profilePhotoCard').src = `data:image/jpeg;base64,${student.profilePic}`;
+            } else {
+                document.getElementById('profilePhotoCard').src = '../../public/profile-pic.png';
+            }
 
-            document.getElementById('stuName').textContent = `${student.fName} ${student.lName}`;
+            console.log('Student data loaded:', student);
+            document.getElementById('stuName').textContent = `${student.fName || ''} ${student.lName || ''}`;
             document.getElementById('stuId').textContent = student.id;
-            document.getElementById('stuAddress').textContent = student.address;
-            document.getElementById('stuNic').textContent = student.nic;
-            document.getElementById('stuContact').textContent = student.contact;
-
-            // document.getElementById('prevBtn').href = `/previous/${student.id}`;
-            // document.getElementById('nextBtn').href = `/next/${student.id}`;
+            document.getElementById('stuAddress').textContent = student.address || 'N/A';
+            document.getElementById('stuNic').textContent = student.nic || 'N/A';
+            document.getElementById('stuContact').textContent = student.contact || 'N/A';
 
             document.getElementById('editBtn').addEventListener('click', () => {
                 editStudent(student.id);
@@ -52,6 +54,7 @@ async function loadProfile() {
             document.getElementById('deleteBtn').addEventListener('click', () => {
                 deleteStudent(student.id);
             });
+            
             document.getElementById('profileCard').style.display = "block";
         } else {
             console.error('Student not found');
@@ -71,20 +74,24 @@ function loadStudents() {
     studentsArray.forEach(student => {
         const row = document.createElement('tr');
         row.setAttribute('data-aos', 'fade-right');
-        prevIndex = row.previousElementSibling.getElementById('rowId');
-        nextIndex = row.nextElementSibling.getElementById('rowId');
+        
+        const firstName = student.fName || student.firstName || '';
+        const lastName = student.lName || student.lastName || '';
+        const profilePicSrc = student.profilePic ? 
+            `data:image/jpeg;base64,${student.profilePic}` : 
+            '../../public/profile-pic.png';
 
         row.innerHTML = `
             <th id='rowId'>${student.id}</th>
-            <td>${student.firstName}</td>
-            <td>${student.lastName}</td>
-            <td>${student.address}</td>
-            <td>${student.dob}</td>
-            <td>${student.nic}</td>
-            <td>${student.contact}</td>
+            <td>${firstName}</td>
+            <td>${lastName}</td>
+            <td>${student.address || ''}</td>
+            <td>${student.dob ? new Date(student.dob).toLocaleDateString() : ''}</td>
+            <td>${student.nic || ''}</td>
+            <td>${student.contact || ''}</td>
             <td>
                 <figure class="image is-48x48">
-                    <img src="data:image/jpeg;base64,${student.profilePic}" alt="Profile Picture" class="is-rounded">
+                    <img src="${profilePicSrc}" alt="Profile Picture" class="is-rounded">
                 </figure>
             </td>
             <td>
@@ -135,15 +142,20 @@ async function deleteStudent(id) {
     try {
         await ApiService.deleteStudent(id);
         alert("Student deleted successfully");
-        await fetchStudents(); // Refresh the student list
-        document.getElementById('profileCard').style.display = "none"; // Hide the profile card
+        await fetchStudents();
+        document.getElementById('profileCard').style.display = "none";
     } catch (error) {
         console.error('Error:', error);
         alert('Error: Unable to delete student.');
     }
 }
 
-function editStudent() {
+function editStudent(id) {
+    const student = studentsArray.find(s => s.id === id);
+    if (!student) {
+        alert("Student not found");
+        return;
+    }
 
-
+    window.location.href = `add_student.html?id=${id}`;
 }

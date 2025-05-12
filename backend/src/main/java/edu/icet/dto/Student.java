@@ -17,8 +17,13 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    
+    @Column(name = "f_name")
     private String fName;
+    
+    @Column(name = "l_name")
     private String lName;
+    
     private String address;
     private Date dob;
     private String nic;
